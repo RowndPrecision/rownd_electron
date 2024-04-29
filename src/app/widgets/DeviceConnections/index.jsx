@@ -42,6 +42,8 @@ class DeviceConnections extends PureComponent {
             this.espOpenPort(port, {
               baudrate: espBaudrate
             });
+
+            return;
           } else {
             this.setState(state => ({
               alertMessage: 'Rownd port not found', // TODO: Localization
