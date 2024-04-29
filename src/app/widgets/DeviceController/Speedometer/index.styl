@@ -1,0 +1,100 @@
+.speedometerContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+    position: relative;
+    height: 300px;
+}
+
+.speedometer {
+    position: absolute;
+    height: 80px;
+  }
+  
+  .speedometerLine {
+    position: absolute;
+    width: 2px;
+    height: 12px;
+    background-color: #fff;
+    transform-origin: bottom center;
+  }
+  
+  .speedometerLongLine {
+    height: 12.5px;
+  }
+  
+  .speedLabel {
+    position: absolute;
+    left: -44px;
+    width: 100px;
+    letter-spacing: 1.2px;
+  }
+  
+  .currentSpeedValue {
+    color: #9747FF;
+    text-align: center;
+    font-family: PT Mono;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+  
+  .speedUnit {
+    color: rgba(255, 255, 255, 0.50);
+    text-align: center;
+    font-family: PT Mono;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
+
+  .numberPicker {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 44px;
+    border-radius: 8px;
+    border: 0.5px solid #99A5FF;
+    background: linear-gradient(270deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.00) 36.46%, rgba(255, 255, 255, 0.00) 67.19%, rgba(255, 255, 255, 0.20) 100%);
+    backdrop-filter: blur(15px);
+    padding: 0 10px;
+    bottom: 16px;
+    position: absolute;
+    margin-left: 3px;
+  }
+  
+  .numberPickerButton {
+    background-color: transparent;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    font-size: 30px;
+    color: #fff;
+    width: 50px;
+  }
+  
+  .numberInput {
+    border: none;
+    text-align: center;
+    font-size: 1rem;
+    width: 50px;
+    margin: 0 10px;
+    background-color: transparent;
+    color: #fff;
+    font-family: PT Mono;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: 0.96px;
+  }
+  
+  /* input type number spinner'ı kaldırmak için */
+  .numberInput::-webkit-outer-spin-button,
+  .numberInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }

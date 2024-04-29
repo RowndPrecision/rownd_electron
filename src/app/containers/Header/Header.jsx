@@ -264,7 +264,9 @@ class Header extends PureComponent {
           inverse
           style={{
             border: 'none',
-            margin: 0
+            margin: 0,
+            backgroundColor: '#000',
+            height: '60px'
           }}
         >
           <Navbar.Header>
@@ -286,12 +288,12 @@ class Header extends PureComponent {
               >
                 <img
                   style={{
-                    margin: '4px auto 0 auto'
+                    margin: '10px 16px 8px'
                   }}
-                  src="images/logo-badge-32x32.png"
+                  src="images/logo-badge-2x.png"
                   alt=""
                 />
-                <div
+                {/* <div
                   style={{
                     fontSize: '50%',
                     lineHeight: '14px',
@@ -300,8 +302,8 @@ class Header extends PureComponent {
                   }}
                 >
                   {settings.version}
-                </div>
-                {newUpdateAvailable && (
+                </div> */}
+                {/* {newUpdateAvailable && (
                   <span
                     className="label label-primary"
                     style={{
@@ -313,7 +315,7 @@ class Header extends PureComponent {
                   >
                                 N
                   </span>
-                )}
+                )} */}
               </Anchor>
             </OverlayTrigger>
             <Navbar.Toggle />

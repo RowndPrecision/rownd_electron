@@ -69,7 +69,7 @@ class AxesWidget extends PureComponent {
       this.setState({ minimized: false });
     };
 
-    config = new WidgetConfig(this.props.widgetId);
+    config = new WidgetConfig('AxesWidget');
 
     state = this.getInitialState();
 

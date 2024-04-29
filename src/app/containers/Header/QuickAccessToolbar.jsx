@@ -3,7 +3,10 @@ import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
+import portal from 'app/lib/portal';
+import Modal from 'app/components/Modal';
 import styles from './index.styl';
+import DeviceConsole from '../../widgets/DeviceConsole';
 
 class QuickAccessToolbar extends PureComponent {
     static propTypes = {
@@ -18,19 +21,27 @@ class QuickAccessToolbar extends PureComponent {
       'feedhold': () => {
         controller.command('feedhold');
       },
-      'homing': () => {
-        controller.command('homing');
+      'console': () => {
+        this.openConsoleWidgetModal();
       },
-      'sleep': () => {
-        controller.command('sleep');
-      },
-      'unlock': () => {
-        controller.command('unlock');
-      },
-      'reset': () => {
-        controller.command('reset');
-      }
     };
+
+    openConsoleWidgetModal() {
+      portal(({ onClose }) => (
+        <Modal size="lg" onClose={onClose}>
+          <Modal.Header>
+            <Modal.Title>
+              {i18n._('Console')}
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <DeviceConsole />
+          </Modal.Body>
+          <Modal.Footer>
+          </Modal.Footer>
+        </Modal>
+      ));
+    }
 
     render() {
       return (
@@ -39,7 +50,7 @@ class QuickAccessToolbar extends PureComponent {
             <li className="btn-group btn-group-sm" role="group">
               <button
                 type="button"
-                className="btn btn-default"
+                className="btn btn-primary"
                 onClick={this.command.cyclestart}
                 title={i18n._('Cycle Start')}
               >
@@ -49,7 +60,7 @@ class QuickAccessToolbar extends PureComponent {
               </button>
               <button
                 type="button"
-                className="btn btn-default"
+                className="btn btn-warning"
                 onClick={this.command.feedhold}
                 title={i18n._('Feedhold')}
               >
@@ -61,43 +72,13 @@ class QuickAccessToolbar extends PureComponent {
             <li className="btn-group btn-group-sm" role="group">
               <button
                 type="button"
-                className="btn btn-primary"
-                onClick={this.command.homing}
-                title={i18n._('Homing')}
+                className="btn btn-default"
+                onClick={this.command.console}
+                title={i18n._('Console')}
               >
-                <i className="fa fa-home" />
+                <i className="fa fa-terminal" />
                 <Space width="8" />
-                {i18n._('Homing')}
-              </button>
-              <button
-                type="button"
-                className="btn btn-success"
-                onClick={this.command.sleep}
-                title={i18n._('Sleep')}
-              >
-                <i className="fa fa-bed" />
-                <Space width="8" />
-                {i18n._('Sleep')}
-              </button>
-              <button
-                type="button"
-                className="btn btn-warning"
-                onClick={this.command.unlock}
-                title={i18n._('Unlock')}
-              >
-                <i className="fa fa-unlock-alt" />
-                <Space width="8" />
-                {i18n._('Unlock')}
-              </button>
-              <button
-                type="button"
-                className="btn btn-danger"
-                onClick={this.command.reset}
-                title={i18n._('Reset')}
-              >
-                <i className="fa fa-undo" />
-                <Space width="8" />
-                {i18n._('Reset')}
+                {i18n._('Console')}
               </button>
             </li>
           </ul>

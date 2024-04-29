@@ -132,7 +132,7 @@ class Connection extends PureComponent {
         <div>
           {alertMessage && (
             <ToastNotification
-              style={{ margin: '-10px -10px 10px -10px' }}
+              style={{ position: 'absolute', right: '10px', top: '10px' }}
               type="error"
               onDismiss={actions.clearAlert}
             >
