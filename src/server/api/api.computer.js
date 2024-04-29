@@ -40,7 +40,9 @@ export const connect = (req, res) => {
         return;
       }
 
-      espController.on('data', (data) => {
+      console.log(espController);
+
+      espController.connection.on('data', (data) => {
         computerConnection.write(data + '\n');
       });
 
