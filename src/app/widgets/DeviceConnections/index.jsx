@@ -295,7 +295,7 @@ class DeviceConnections extends PureComponent {
             infoText="*For connect to computer please use your computer"
             isManualConnectable={true}
             onTapAction={() => {
-              api.computer.connect()
+              api.computer.connect(this.state.espPort)
                 .then((res) => {
                   const { data } = res.body;
                   console.log(data);

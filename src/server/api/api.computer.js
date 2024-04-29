@@ -1,11 +1,13 @@
 //import _ from 'lodash';
 import { SerialPort } from 'serialport';
-import controller from 'app/lib/controller';
+//import controller from 'app/lib/controller';
+import store from '../store';
 import SerialConnection from '../lib/SerialConnection';
 import logger from '../lib/logger';
 //import { GRBL_REALTIME_COMMANDS } from '../controllers/Grbl/constants';
 
 const log = logger('api:computer');
+
 // const noop = _.noop;
 // const CONFIG_KEY = 'computer';
 
@@ -28,13 +30,23 @@ export const connect = (req, res) => {
       });
 
       if (computerConnection && computerConnection.isOpen) {
-        log.error(`Cannot open serial port "${req.port}"`);
+        log.error(`Cannot open serial port "${ports[1].path}"`);
         return;
       }
 
       const connectionEventListener = {
         data: (data) => {
-          controller.command(data);
+          const controller = store.get('controllers["' + req.espPort + '"]');
+          if (!controller) {
+            console.log('Controller not found');
+            return;
+          }
+          controller.command('gcode', data, (err, state) => {
+            if (err) {
+              console.log('Failed to send G-code: ' + err);
+            }
+            console.log('state', state);
+          });
         },
         close: (err) => {
           if (computerConnection) {
@@ -50,20 +62,18 @@ export const connect = (req, res) => {
 
       computerConnection.open((err) => {
         if (err) {
-          log.error(`Error opening serial port "${req.port}":`, err);
+          log.error(`Error opening serial port "${ports[1].path}":`, err);
           return;
         }
 
-        log.debug(`Connected to serial port "${req.port}"`);
+        log.debug(`Connected to serial port "${ports[1].path}"`);
 
         res.send({
-          data: `Connected to serial port "${req.port}"`
+          data: `Connected to serial port "${ports[1].path}"`
         });
       });
 
-      computerConnection.on('data', (data) => {
-        console.log(data);
-      });
+      computerConnection.on('data', connectionEventListener.data);
       computerConnection.on('close', connectionEventListener.close);
       computerConnection.on('error', connectionEventListener.error);
     })

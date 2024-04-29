@@ -668,9 +668,10 @@ machines.run = (id) => new Promise((resolve, reject) => {
 //
 const computer = {};
 
-computer.connect = () => new Promise((resolve, reject) => {
+computer.connect = (espPort) => new Promise((resolve, reject) => {
   authrequest
     .post('/api/computer/connect')
+    .send({ espPort: espPort })
     .end((err, res) => {
       if (err) {
         reject(res);
