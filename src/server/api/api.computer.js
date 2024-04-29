@@ -34,14 +34,19 @@ export const connect = (req, res) => {
         return;
       }
 
+      const espController = store.get('controllers["' + req.body.espPort + '"]');
+      if (!espController) {
+        console.log('ESP Controller not found');
+        return;
+      }
+
+      espController.on('data', (data) => {
+        computerConnection.write(data + '\n');
+      });
+
       const connectionEventListener = {
         data: (data) => {
-          const controller = store.get('controllers["' + req.body.espPort + '"]');
-          if (!controller) {
-            console.log('Controller not found');
-            return;
-          }
-          controller.command('gcode', data, (err, state) => {
+          espController.command('gcode', data, (err, state) => {
             if (err) {
               console.log('Failed to send G-code: ' + err);
             }
