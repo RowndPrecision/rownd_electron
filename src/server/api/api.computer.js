@@ -36,7 +36,7 @@ export const connect = (req, res) => {
 
       const connectionEventListener = {
         data: (data) => {
-          const controller = store.get('controllers["' + req.espPort + '"]');
+          const controller = store.get('controllers["' + req.body.espPort + '"]');
           if (!controller) {
             console.log('Controller not found');
             return;
