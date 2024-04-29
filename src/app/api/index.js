@@ -663,6 +663,37 @@ machines.run = (id) => new Promise((resolve, reject) => {
     });
 });
 
+//
+// Machines
+//
+const computer = {};
+
+computer.connect = () => new Promise((resolve, reject) => {
+  authrequest
+    .post('/api/computer/connect')
+    .end((err, res) => {
+      if (err) {
+        reject(res);
+      } else {
+        resolve(res);
+      }
+    });
+});
+
+computer.sendCommand = (command) => new Promise((resolve, reject) => {
+  authrequest
+    .post('/api/computer/sendCommand')
+    .send({ data: command })
+    .end((err, res) => {
+      if (err) {
+        reject(res);
+      } else {
+        resolve(res);
+      }
+    });
+});
+
+
 export default {
   getLatestVersion,
 
@@ -692,4 +723,7 @@ export default {
   macros,
   mdi,
   users,
+
+  // Other Device Connectionsü
+  computer
 };

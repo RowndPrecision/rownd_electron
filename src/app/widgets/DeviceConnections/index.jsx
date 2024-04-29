@@ -4,10 +4,10 @@ import _ from 'lodash';
 // import cx from 'classnames';
 import log from 'app/lib/log';
 import i18n from 'app/lib/i18n';
+import api from 'app/api';
 import espController from 'app/lib/controller';
 import { ToastNotification } from 'app/components/Notifications';
-import {
-  GRBL,
+import { GRBL,
   GRBL_ACTIVE_STATE_IDLE,
   GRBL_ACTIVE_STATE_RUN,
   GRBL_ACTIVE_STATE_HOLD,
@@ -112,7 +112,7 @@ class DeviceConnections extends PureComponent {
 
     componentDidMount() {
       this.addEspControllerEvents();
-      this.espRefreshPorts();
+      //this.espRefreshPorts();
     }
 
     componentWillUnmount() {
@@ -277,16 +277,32 @@ class DeviceConnections extends PureComponent {
             deviceName="Gamepad"
             isConnected={false}
             infoText="*For connect to phone please use your gamepad"
-            isManualConnectable={false}
-            onTapAction={() => {}}
+            isManualConnectable={true}
+            onTapAction={() => {
+              api.computer.sendCommand('?')
+                .then((res) => {
+                  const { data } = res.body;
+                  console.log(data);
+                })
+                .catch((res) => {
+                });
+            }}
           />
           <ConnectedDevice
             className={styles.connectedDevice}
             deviceName="Computer"
-            isConnected={false}
+            isConnected={true}
             infoText="*For connect to computer please use your computer"
-            isManualConnectable={false}
-            onTapAction={() => {}}
+            isManualConnectable={true}
+            onTapAction={() => {
+              api.computer.connect()
+                .then((res) => {
+                  const { data } = res.body;
+                  console.log(data);
+                })
+                .catch((res) => {
+                });
+            }}
           />
         </div>
       );
