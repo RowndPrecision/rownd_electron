@@ -1,15 +1,13 @@
-import _ from 'lodash';
+//import _ from 'lodash';
 import { SerialPort } from 'serialport';
-import SerialConnection from '../lib/SerialConnection';
 import controller from 'app/lib/controller';
+import SerialConnection from '../lib/SerialConnection';
 import logger from '../lib/logger';
-import store from '../store';
-import delay from '../lib/delay';
-import { GRBL_REALTIME_COMMANDS } from '../controllers/Grbl/constants';
+//import { GRBL_REALTIME_COMMANDS } from '../controllers/Grbl/constants';
 
 const log = logger('api:computer');
-const noop = _.noop;
-const CONFIG_KEY = 'computer';
+// const noop = _.noop;
+// const CONFIG_KEY = 'computer';
 
 let computerConnection = null;
 
@@ -77,6 +75,7 @@ export const connect = (req, res) => {
 export const refreshConnection = (req, res) => {
   if (!computerConnection) {
     const err = `Serial port "${computerConnection.port}" is not available`;
+    console.log(err);
     return;
   }
 
