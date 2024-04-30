@@ -75,9 +75,7 @@ export const connect = (req, res) => {
           }
         },
         espData: (data) => {
-          espController.command('gcode', data, (err, state) => {
-            computerConnection.write(data + '\n');
-          });
+          computerConnection.write(data + '\n');
         },
       };
     })

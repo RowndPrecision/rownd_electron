@@ -4,7 +4,8 @@ import _ from 'lodash';
 // import cx from 'classnames';
 import log from 'app/lib/log';
 import i18n from 'app/lib/i18n';
-import api from 'app/api';
+import store from 'app//store';
+//import api from 'app/api';
 import espController from 'app/lib/controller';
 import { ToastNotification } from 'app/components/Notifications';
 import { GRBL,
@@ -35,7 +36,7 @@ class DeviceConnections extends PureComponent {
         this.stopLoading();
 
         this.setState(state => ({
-          ports: [],
+          ports: ports,
         }));
 
         ports.forEach((port) => {
@@ -77,7 +78,7 @@ class DeviceConnections extends PureComponent {
             type: controllerType,
             state: controllerState
           },
-          //espPort: port,
+          espPort: options,
           espBaudrate: baudrate,
         }));
 
@@ -300,21 +301,40 @@ class DeviceConnections extends PureComponent {
             onTapAction={() => {
               this.socket && this.socket.destroy();
 
-              const SERVER_URL = '';
-              this.socket = io.connect(SERVER_URL, { path: '/socket2.io' });
-
-              console.log(this.socket);
+              const token = store.get('session.token');
+              const host = '';
+              const options = {
+                query: 'token=' + token,
+                path: '/computer-socket.io'
+              };
+              this.socket = io.connect(host, options);
 
               this.socket.on('connect', () => {
                 console.log('Socket.IO sunucusuna bağlantı kuruldu.');
 
-                const computerPort = this.state.ports.find(port => port.manufacturer === 'Silicon Labs')[1];
+                const espPort = this.state.ports[0];
+                const computerPort = this.state.ports[1];
 
-                this.socket.emit('open', this.state.espPort, computerPort, (data) => {
-                  console.log(data);
+                this.socket.emit('open', espPort, computerPort, (connection) => {
+                  console.log('open', espPort, computerPort, connection);
+                });
+
+                this.socket.on('computer:data', (data, err, state) => {
+                  console.log('computer:data', data, err, state);
+                });
+
+                this.socket.on('computer:error', (err) => {
+                  console.log('computer:error', err);
+                });
+
+                this.socket.on('computer:close', (err) => {
+                  console.log('computer:close', err);
+                });
+
+                this.socket.on('computer-esp:data', (data) => {
+                  console.log('computer-esp:data', data);
                 });
               });
-              
               // api.computer.connect(this.state.espPort)
               //   .then((res) => {
               //     const { data } = res.body;

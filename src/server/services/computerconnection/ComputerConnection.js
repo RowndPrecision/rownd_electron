@@ -1,7 +1,7 @@
 import noop from 'lodash/noop';
 import socketIO from 'socket.io';
-//import socketioJwt from 'socketio-jwt';
-//import settings from '../../config/settings';
+import socketioJwt from 'socketio-jwt';
+import settings from '../../config/settings';
 import logger from '../../lib/logger';
 import store from '../../store';
 import SerialConnection from '../../lib/SerialConnection';
@@ -25,36 +25,33 @@ class ComputerConnection {
       this.server = server;
       this.io = socketIO(this.server, {
         serveClient: true,
-        path: '/socket2.io'
+        path: '/computer-socket.io'
       });
 
-      console.log(this.io);
+      this.io.use(socketioJwt.authorize({
+        secret: settings.secret,
+        handshake: true
+      }));
 
-      //   this.io.use(socketioJwt.authorize({
-      //     secret: settings.secret,
-      //     handshake: true
-      //   }));
+      this.io.use(async (socket, next) => {
+        try {
+          // IP Address Access Control
+          const ipaddr = socket.handshake.address;
+          await authorizeIPAddress(ipaddr);
 
-      //   this.io.use(async (socket, next) => {
-      //     try {
-      //       // IP Address Access Control
-      //       const ipaddr = socket.handshake.address;
-      //       await authorizeIPAddress(ipaddr);
+          // User Validation
+          const user = socket.decoded_token || {};
+          await validateUser(user);
+        } catch (err) {
+          log.warn(err);
+          next(err);
+          return;
+        }
 
-      //       // User Validation
-      //       const user = socket.decoded_token || {};
-      //       await validateUser(user);
-      //     } catch (err) {
-      //       log.warn(err);
-      //       next(err);
-      //       return;
-      //     }
-
-      //     next();
-      //   });
+        next();
+      });
 
       this.io.on('connection', (socket) => {
-        console.log('socket connection computer', socket);
         const address = socket.handshake.address;
         const user = socket.decoded_token || {};
 
@@ -67,7 +64,6 @@ class ComputerConnection {
 
         // Open serial port
         socket.on('open', (espPort, port, callback = noop) => {
-          console.log(espPort, port);
           if (typeof callback !== 'function') {
             callback = noop;
           }
@@ -84,6 +80,7 @@ class ComputerConnection {
           const espController = store.get('controllers["' + espPort.port + '"]');
           if (!espController) {
             log.error('ESP Controller not found');
+            callback(null);
             return;
           }
 
@@ -94,26 +91,18 @@ class ComputerConnection {
 
           this.computerConnection.open((err) => {
             if (err) {
-              log.error(`Error opening serial port "${port.path}":`, err);
+              log.error(`Error opening serial port "${port.port}":`, err);
+              callback(null);
               return;
             }
 
-            log.debug(`Connected to serial port "${port.path}"`);
-
-            this.computerConnection.on('data', connectionEventListener.data);
-            this.computerConnection.on('close', connectionEventListener.close);
-            this.computerConnection.on('error', connectionEventListener.error);
-            espController.connection.on('data', connectionEventListener.espData);
+            log.debug(`Connected to serial port "${port.port}"`);
 
             const connectionEventListener = {
               data: (data) => {
                 espController.command('gcode', data, (err, state) => {
-                  if (err) {
-                    socket.emit('computer:data-error', err);
-                  }
-                  socket.emit('computer:data-state', state);
+                  socket.emit('computer:data', data, err, state);
                 });
-                socket.emit('computer:data', data);
               },
               close: (err) => {
                 if (this.computerConnection) {
@@ -123,18 +112,22 @@ class ComputerConnection {
               },
               error: (err) => {
                 if (err) {
-                  log.error(`Unexpected error while reading/writing serial port "${port}":`, err);
-                  socket.emit('computer:error', err);
+                  log.error(`Unexpected error while reading/writing serial port "${port.port}":`, err);
                 }
+                socket.emit('computer:error', err);
               },
               espData: (data) => {
-                espController.command('gcode', data, (err, state) => {
-                  this.computerConnection.write(data + '\n');
-                });
-                socket.emit('computer:espData', data);
+                this.computerConnection.write(data + '\n');
+                socket.emit('computer-esp:data', data);
               },
             };
+
+            this.computerConnection.on('data', connectionEventListener.data);
+            this.computerConnection.on('close', connectionEventListener.close);
+            this.computerConnection.on('error', connectionEventListener.error);
+            espController.connection.on('data', connectionEventListener.espData);
           });
+          callback(this.computerConnection);
         });
 
         // Close serial port
