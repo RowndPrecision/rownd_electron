@@ -123,6 +123,19 @@ class DeviceConnections extends PureComponent {
     componentDidMount() {
       this.addEspControllerEvents();
       //this.espRefreshPorts();
+
+      this.socket && this.socket.destroy();
+      const token = store.get('session.token');
+      const host = '';
+      const options = {
+        query: 'token=' + token,
+        path: '/computer-socket.io'
+      };
+      this.socket = io.connect(host, options);
+
+      this.socket.on('connect', () => {
+        console.log('Socket.IO sunucusuna bağlantı kuruldu.');
+      });
     }
 
     componentWillUnmount() {
@@ -299,41 +312,27 @@ class DeviceConnections extends PureComponent {
             infoText="*For connect to computer please use your computer"
             isManualConnectable={true}
             onTapAction={() => {
-              this.socket && this.socket.destroy();
+              const espPort = this.state.ports[0];
+              const computerPort = this.state.ports[1];
 
-              const token = store.get('session.token');
-              const host = '';
-              const options = {
-                query: 'token=' + token,
-                path: '/computer-socket.io'
-              };
-              this.socket = io.connect(host, options);
+              this.socket.emit('open', espPort, computerPort, (connection) => {
+                console.log('open', espPort, computerPort, connection);
+              });
 
-              this.socket.on('connect', () => {
-                console.log('Socket.IO sunucusuna bağlantı kuruldu.');
+              this.socket.on('computer:data', (data, err, state) => {
+                console.log('computer:data', data, err, state);
+              });
 
-                const espPort = this.state.ports[0];
-                const computerPort = this.state.ports[1];
+              this.socket.on('computer:error', (err) => {
+                console.log('computer:error', err);
+              });
 
-                this.socket.emit('open', espPort, computerPort, (connection) => {
-                  console.log('open', espPort, computerPort, connection);
-                });
+              this.socket.on('computer:close', (err) => {
+                console.log('computer:close', err);
+              });
 
-                this.socket.on('computer:data', (data, err, state) => {
-                  console.log('computer:data', data, err, state);
-                });
-
-                this.socket.on('computer:error', (err) => {
-                  console.log('computer:error', err);
-                });
-
-                this.socket.on('computer:close', (err) => {
-                  console.log('computer:close', err);
-                });
-
-                this.socket.on('computer-esp:data', (data) => {
-                  console.log('computer-esp:data', data);
-                });
+              this.socket.on('computer-esp:data', (data) => {
+                console.log('computer-esp:data', data);
               });
               // api.computer.connect(this.state.espPort)
               //   .then((res) => {
