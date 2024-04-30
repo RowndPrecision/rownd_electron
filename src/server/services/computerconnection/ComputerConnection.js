@@ -122,6 +122,11 @@ class ComputerConnection {
 
           this.espPort = espPort;
           this.port = port;
+
+          if (this.isOpen()) {
+            this.close();
+          }
+
           this.connection = new SerialConnection({
             path: port.port,
             baudRate: 115200

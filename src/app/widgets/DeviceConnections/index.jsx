@@ -136,6 +136,22 @@ class DeviceConnections extends PureComponent {
       this.socket.on('connect', () => {
         console.log('Socket.IO sunucusuna bağlantı kuruldu.');
       });
+
+      this.socket.on('computer:data', (data, err, state) => {
+        console.log('computer:data', data, err, state);
+      });
+
+      this.socket.on('computer:error', (err) => {
+        console.log('computer:error', err);
+      });
+
+      this.socket.on('computer:close', (err) => {
+        console.log('computer:close', err);
+      });
+
+      this.socket.on('computer-esp:data', (data) => {
+        console.log('computer-esp:data', data);
+      });
     }
 
     componentWillUnmount() {
@@ -317,22 +333,6 @@ class DeviceConnections extends PureComponent {
 
               this.socket.emit('open', espPort, computerPort, (connection) => {
                 console.log('open', espPort, computerPort, connection);
-              });
-
-              this.socket.on('computer:data', (data, err, state) => {
-                console.log('computer:data', data, err, state);
-              });
-
-              this.socket.on('computer:error', (err) => {
-                console.log('computer:error', err);
-              });
-
-              this.socket.on('computer:close', (err) => {
-                console.log('computer:close', err);
-              });
-
-              this.socket.on('computer-esp:data', (data) => {
-                console.log('computer-esp:data', data);
               });
               // api.computer.connect(this.state.espPort)
               //   .then((res) => {
