@@ -681,19 +681,6 @@ computer.connect = (espPort) => new Promise((resolve, reject) => {
     });
 });
 
-computer.sendCommand = (command) => new Promise((resolve, reject) => {
-  authrequest
-    .post('/api/computer/sendCommand')
-    .send({ data: command })
-    .end((err, res) => {
-      if (err) {
-        reject(res);
-      } else {
-        resolve(res);
-      }
-    });
-});
-
 
 export default {
   getLatestVersion,

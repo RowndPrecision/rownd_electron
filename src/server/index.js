@@ -24,6 +24,7 @@ import config from './services/configstore';
 import { ensureString } from './lib/ensure-type';
 import logger, { setLevel } from './lib/logger';
 import urljoin from './lib/urljoin';
+import { computerconnection } from './services';
 
 const log = logger('init');
 
@@ -236,6 +237,8 @@ const createServer = (options, callback) => {
     .on('ready', (server) => {
       // cncengine service
       cncengine.start(server, options.controller || config.get('controller', ''));
+
+      computerconnection.start(server);
 
       const address = server.address().address;
       const port = server.address().port;

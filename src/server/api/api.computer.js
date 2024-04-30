@@ -14,36 +14,45 @@ const log = logger('api:computer');
 let computerConnection = null;
 
 export const connect = (req, res) => {
+  if (computerConnection && computerConnection.isOpen) {
+    log.error('Cannot open computer connection port ');
+    return;
+  }
+
+  const espController = store.get('controllers["' + req.body.espPort + '"]');
+  if (!espController) {
+    log.error('ESP Controller not found');
+    return;
+  }
+
   SerialPort.list()
     .then(ports => {
-      console.log(ports);
-      computerConnection = new SerialConnection({
-        path: ports[1].path,
-        baudRate: 115200,
-        writeFilter: (data) => {
-          const line = data.trim();
-          if (!line) {
-            return data;
-          }
-          return data;
+      ports.forEach(port => {
+        if (port.manufacturer === 'Silicon Labs') {
+          computerConnection = new SerialConnection({
+            path: ports[1].path,
+            baudRate: 115200
+          });
+          return;
         }
       });
 
-      if (computerConnection && computerConnection.isOpen) {
-        log.error(`Cannot open serial port "${ports[1].path}"`);
-        return;
-      }
+      computerConnection.open((err) => {
+        if (err) {
+          log.error(`Error opening serial port "${ports[1].path}":`, err);
+          return;
+        }
 
-      const espController = store.get('controllers["' + req.body.espPort + '"]');
-      if (!espController) {
-        console.log('ESP Controller not found');
-        return;
-      }
+        log.debug(`Connected to serial port "${ports[1].path}"`);
 
-      console.log(espController);
+        computerConnection.on('data', connectionEventListener.data);
+        computerConnection.on('close', connectionEventListener.close);
+        computerConnection.on('error', connectionEventListener.error);
+        espController.connection.on('data', connectionEventListener.espData);
 
-      espController.connection.on('data', (data) => {
-        computerConnection.write(data + '\n');
+        // res.send({
+        //   data: `Connected to serial port "${ports[1].path}"`
+        // });
       });
 
       const connectionEventListener = {
@@ -64,25 +73,13 @@ export const connect = (req, res) => {
           if (err) {
             log.error(`Unexpected error while reading/writing serial port "${req.port}":`, err);
           }
-        }
+        },
+        espData: (data) => {
+          espController.command('gcode', data, (err, state) => {
+            computerConnection.write(data + '\n');
+          });
+        },
       };
-
-      computerConnection.open((err) => {
-        if (err) {
-          log.error(`Error opening serial port "${ports[1].path}":`, err);
-          return;
-        }
-
-        log.debug(`Connected to serial port "${ports[1].path}"`);
-
-        res.send({
-          data: `Connected to serial port "${ports[1].path}"`
-        });
-      });
-
-      computerConnection.on('data', connectionEventListener.data);
-      computerConnection.on('close', connectionEventListener.close);
-      computerConnection.on('error', connectionEventListener.error);
     })
     .catch(err => {
       log.error(err);
@@ -102,21 +99,4 @@ export const refreshConnection = (req, res) => {
 
   computerConnection.removeAllListeners();
   computerConnection.close();
-};
-
-export const sendCommand = (req, res) => {
-  if (!(computerConnection && computerConnection.isOpen)) {
-    log.error(`Serial port "${this.options.port}" is not accessible`);
-    return;
-  }
-
-  console.log(req.body.data);
-
-  computerConnection.write(req.body.data + '\n');
-
-//   if (_.includes(GRBL_REALTIME_COMMANDS, req)) {
-//     computerConnection.write(req.body.data);
-//   } else {
-//     computerConnection.write(req + '\n');
-//   }
 };

@@ -321,7 +321,6 @@ const appMain = () => {
 
     // Computer Connection
     app.post(urljoin(settings.route, 'api/computer/connect'), api.computer.connect);
-    app.post(urljoin(settings.route, 'api/computer/sendCommand'), api.computer.sendCommand);
   }
 
   // page

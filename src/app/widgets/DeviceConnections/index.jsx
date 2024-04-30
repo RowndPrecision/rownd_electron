@@ -16,6 +16,7 @@ import { GRBL,
   GRBL_ACTIVE_STATE_SLEEP,
   GRBL_ACTIVE_STATE_ALARM,
   GRBL_ACTIVE_STATE_CHECK } from 'app/constants';
+import io from 'socket.io-client';
 import styles from './index.styl';
 import ConnectedDevice from './ConnectedDevice';
 
@@ -25,11 +26,17 @@ class DeviceConnections extends PureComponent {
 
     state = this.getInitialState();
 
+    socket = null;
+
     espControllerEvents = {
       'serialport:list': (ports) => {
         log.debug('Received a list of serial ports:', ports);
 
         this.stopLoading();
+
+        this.setState(state => ({
+          ports: [],
+        }));
 
         ports.forEach((port) => {
           const { espPortManufacturer, espBaudrate } = this.state;
@@ -70,7 +77,7 @@ class DeviceConnections extends PureComponent {
             type: controllerType,
             state: controllerState
           },
-          espPort: port,
+          //espPort: port,
           espBaudrate: baudrate,
         }));
 
@@ -119,11 +126,13 @@ class DeviceConnections extends PureComponent {
 
     componentWillUnmount() {
       this.removeEspControllerEvents();
+      this.socket.disconnect();
     }
 
     getInitialState() {
       return {
         loading: false,
+        ports: [],
         espConnecting: false,
         espConnected: false,
         espPortManufacturer: 'Silicon Labs',
@@ -280,15 +289,7 @@ class DeviceConnections extends PureComponent {
             isConnected={false}
             infoText="*For connect to phone please use your gamepad"
             isManualConnectable={true}
-            onTapAction={() => {
-              api.computer.sendCommand('?')
-                .then((res) => {
-                  const { data } = res.body;
-                  console.log(data);
-                })
-                .catch((res) => {
-                });
-            }}
+            onTapAction={() => {}}
           />
           <ConnectedDevice
             className={styles.connectedDevice}
@@ -297,13 +298,30 @@ class DeviceConnections extends PureComponent {
             infoText="*For connect to computer please use your computer"
             isManualConnectable={true}
             onTapAction={() => {
-              api.computer.connect(this.state.espPort)
-                .then((res) => {
-                  const { data } = res.body;
+              this.socket && this.socket.destroy();
+
+              const SERVER_URL = '';
+              this.socket = io.connect(SERVER_URL, { path: '/socket2.io' });
+
+              console.log(this.socket);
+
+              this.socket.on('connect', () => {
+                console.log('Socket.IO sunucusuna bağlantı kuruldu.');
+
+                const computerPort = this.state.ports.find(port => port.manufacturer === 'Silicon Labs')[1];
+
+                this.socket.emit('open', this.state.espPort, computerPort, (data) => {
                   console.log(data);
-                })
-                .catch((res) => {
                 });
+              });
+              
+              // api.computer.connect(this.state.espPort)
+              //   .then((res) => {
+              //     const { data } = res.body;
+              //     console.log(data);
+              //   })
+              //   .catch((res) => {
+              //   });
             }}
           />
         </div>
