@@ -17,9 +17,60 @@ class ComputerConnection {
 
     io = null;
 
-    sockets = [];
+    connection = null;
 
-    computerConnection = null;
+    espController = null;
+
+    socket = null;
+
+    port = null;
+
+    espPort = null;
+
+    connectionEventListener = {
+      data: (data) => {
+        this.espController.command('gcode', data, (err, state) => {
+          this.socket.emit('computer:data', data, err, state);
+        });
+      },
+      close: (err) => {
+        this.socket.emit('computer:close', err);
+        if (this.connection) {
+          this.connection = null;
+        }
+        this.close(err => {
+          // Remove controller from store
+          const port = this.port.port;
+          store.unset(`controllers[${JSON.stringify(port)}]`);
+
+          if (this.connection) {
+            this.connection = null;
+          }
+
+          this.espController = null;
+          this.espPort = null;
+          this.port = null;
+        });
+      },
+      error: (err) => {
+        if (err) {
+          log.error(`Unexpected error while reading/writing serial port "${this.port.port}":`, err);
+        }
+        this.socket.emit('computer:error', err);
+      },
+      espData: (data) => {
+        this.connection.write(data + '\n');
+        this.socket.emit('computer-esp:data', data);
+      },
+    };
+
+    isOpen() {
+      return this.connection && this.connection.isOpen;
+    }
+
+    isClose() {
+      return !(this.isOpen());
+    }
 
     start(server) {
       this.server = server;
@@ -55,8 +106,7 @@ class ComputerConnection {
         const address = socket.handshake.address;
         const user = socket.decoded_token || {};
 
-        // Add to the socket pool
-        this.sockets.push(socket);
+        this.socket = socket;
 
         socket.on('disconnect', () => {
           log.debug(`Disconnected from ${address}: id=${socket.id}, user.id=${user.id}, user.name=${user.name}`);
@@ -70,64 +120,20 @@ class ComputerConnection {
 
           log.debug(`socket.open("${JSON.stringify(port)}", esp port ${JSON.stringify(espPort)}): id=${socket.id}`);
 
-          if (this.computerConnection && this.computerConnection.isOpen) {
-            log.error('Cannot open computer connection port ');
-            socket.join(port);
-            callback(null);
-            return;
-          }
-
-          const espController = store.get('controllers["' + espPort.port + '"]');
-          if (!espController) {
-            log.error('ESP Controller not found');
-            callback(null);
-            return;
-          }
-
-          this.computerConnection = new SerialConnection({
+          this.espPort = espPort;
+          this.port = port;
+          this.connection = new SerialConnection({
             path: port.port,
             baudRate: 115200
           });
 
-          this.computerConnection.open((err) => {
+          this.open(espPort, port, (err) => {
             if (err) {
-              log.error(`Error opening serial port "${port.port}":`, err);
-              callback(null);
-              return;
+              log.error('Cannot open computer connection port ');
             }
-
-            log.debug(`Connected to serial port "${port.port}"`);
-
-            const connectionEventListener = {
-              data: (data) => {
-                espController.command('gcode', data, (err, state) => {
-                  socket.emit('computer:data', data, err, state);
-                });
-              },
-              close: (err) => {
-                if (this.computerConnection) {
-                  this.computerConnection = null;
-                }
-                socket.emit('computer:close', err);
-              },
-              error: (err) => {
-                if (err) {
-                  log.error(`Unexpected error while reading/writing serial port "${port.port}":`, err);
-                }
-                socket.emit('computer:error', err);
-              },
-              espData: (data) => {
-                this.computerConnection.write(data + '\n');
-                socket.emit('computer-esp:data', data);
-              },
-            };
-
-            this.computerConnection.on('data', connectionEventListener.data);
-            this.computerConnection.on('close', connectionEventListener.close);
-            this.computerConnection.on('error', connectionEventListener.error);
-            espController.connection.on('data', connectionEventListener.espData);
           });
-          callback(this.computerConnection);
+
+          callback(this.connection);
         });
 
         // Close serial port
@@ -136,25 +142,59 @@ class ComputerConnection {
             callback = noop;
           }
 
-          if (!this.computerConnection) {
-            const err = `Serial port "${this.computerConnection.port}" is not available`;
-            console.log(err);
-            return;
-          }
-
-          if (!(this.computerConnection && this.computerConnection.isOpen)) {
-            return;
-          }
-
-          this.computerConnection.close();
-
           // Leave the room
           socket.leave(port);
-
-          this.computerConnection.removeAllListeners();
-          this.computerConnection.close();
         });
       });
+    }
+
+    open(espPort, port, callback = noop) {
+      // Assertion check
+      if (this.isOpen()) {
+        log.error(`Cannot open serial port "${port}"`);
+        return;
+      }
+
+      this.espController = store.get('controllers["' + espPort.port + '"]');
+      if (!this.espController) {
+        log.error('ESP Controller not found');
+        callback(null);
+        return;
+      }
+
+      this.connection.on('data', this.connectionEventListener.data);
+      this.connection.on('close', this.connectionEventListener.close);
+      this.connection.on('error', this.connectionEventListener.error);
+      this.espController.connection.on('data', this.connectionEventListener.espData);
+
+      this.connection.open((err) => {
+        if (err) {
+          log.error(`Error opening serial port "${port.port}":`, err);
+          callback(err);
+          return;
+        }
+
+        callback();
+
+        log.debug(`Connected to serial port "${port.port}"`);
+      });
+    }
+
+    close(callback) {
+      // Assertion check
+      if (!this.connection) {
+        const err = 'Serial port is not available';
+        callback(new Error(err));
+        return;
+      }
+
+      if (this.isClose()) {
+        callback(null);
+        return;
+      }
+
+      this.connection.removeAllListeners();
+      this.connection.close(callback);
     }
 }
 
