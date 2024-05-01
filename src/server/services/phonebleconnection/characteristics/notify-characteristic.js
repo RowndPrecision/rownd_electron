@@ -1,5 +1,6 @@
 const bleno = require('bleno');
 const { Buffer } = require('buffer');
+const bleEventEmitter = require('../event-emitter');
 
 class NotifyCharacteristic extends bleno.Characteristic {
   constructor(uuid) {
@@ -14,22 +15,16 @@ class NotifyCharacteristic extends bleno.Characteristic {
 
     this.isSubscribed = true;
     this.updateValueCallback = updateValueCallback;
-    this.sendNotification();
+
+    bleEventEmitter.on('phoneble-esp:data', (data) => {
+      const bufferData = Buffer.from(data);
+      this.updateValueCallback(bufferData);
+    });
   }
 
   onUnsubscribe() {
     console.log('NotifyCharacteristic - onUnsubscribe');
-    this.isSubscribed = false;
     this.updateValueCallback = null;
-  }
-
-  sendNotification(data) {
-    console.log(this.isSubscribed, this.updateValueCallback, data, this.isSubscribed && this.updateValueCallback && data);
-    if (this.isSubscribed && this.updateValueCallback && data) {
-      console.log(data);
-      const data = Buffer.from(data);
-      this.updateValueCallback(data);
-    }
   }
 }
 

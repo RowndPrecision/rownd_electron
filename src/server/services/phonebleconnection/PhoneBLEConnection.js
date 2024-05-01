@@ -102,8 +102,7 @@ class PhoneBLEConnection {
         console.log(`on -> rssiUpdate: ${rssi}`);
       },
       espData: (data) => {
-        this.socket.emit('phoneble-esp:data', data);
-        notifyCharacteristic.sendNotification(data);
+        bleEventEmitter.emit('phoneble-esp:data', data);
       },
       writeRequestReceived: (data) => {
         if (data.coordinates) {
