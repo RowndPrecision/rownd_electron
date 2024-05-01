@@ -18,7 +18,7 @@ class NotifyCharacteristic extends bleno.Characteristic {
 
     bleEventEmitter.on('phoneble-esp:data', (data) => {
       const bufferData = Buffer.from(data);
-      this.updateValueCallback(bufferData);
+      updateValueCallback && this.updateValueCallback(bufferData);
     });
   }
 
