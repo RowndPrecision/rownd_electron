@@ -11,7 +11,7 @@ import {
 } from '../../access-control';
 
 const bleno = require('bleno');
-const eventEmitter = require('./event-emitter');
+const bleEventEmitter = require('./event-emitter');
 
 const BlenoPrimaryService = bleno.PrimaryService;
 
@@ -101,6 +101,7 @@ class PhoneBLEConnection {
       },
       espData: (data) => {
         this.socket.emit('phoneble-esp:data', data);
+        bleEventEmitter.emit('esp-status', data);
       },
       writeRequestReceived: (data) => {
         if (data.coordinates) {
@@ -210,8 +211,8 @@ class PhoneBLEConnection {
       bleno.on('servicesSet', this.eventListener.servicesSet);
       bleno.on('servicesSetError', this.eventListener.servicesSetError);
       bleno.on('rssiUpdate', this.eventListener.rssiUpdate);
-      eventEmitter.on('writeRequestReceived', this.eventListener.writeRequestReceived);
-      //this.espController.connection.on('data', this.eventListener.espData);
+      bleEventEmitter.on('writeRequestReceived', this.eventListener.writeRequestReceived);
+      this.espController.connection.on('data', this.eventListener.espData);
     }
 
     close() {

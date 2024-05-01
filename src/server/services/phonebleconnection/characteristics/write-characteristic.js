@@ -2,7 +2,7 @@ const bleno = require('bleno');
 const fs = require('fs');
 const path = require('path');
 const { Buffer } = require('buffer');
-const eventEmitter = require('../event-emitter');
+const bleEventEmitter = require('../event-emitter');
 
 class WriteCharacteristic extends bleno.Characteristic {
   constructor(uuid) {
@@ -19,7 +19,6 @@ class WriteCharacteristic extends bleno.Characteristic {
   }
 
   onWriteRequest(data, offset, withoutResponse, callback) {
-    console.log(data);
     const headerEndIndex = data.indexOf('\n');
     if (headerEndIndex !== -1) {
       const header = JSON.parse(data.slice(0, headerEndIndex).toString());
@@ -29,7 +28,7 @@ class WriteCharacteristic extends bleno.Characteristic {
           data.slice(headerEndIndex + 1).toString(),
         );
 
-        eventEmitter.emit('writeRequestReceived', coordinates);
+        bleEventEmitter.emit('writeRequestReceived', coordinates);
 
         if (!withoutResponse) {
           callback(this.RESULT_SUCCESS);
@@ -84,7 +83,7 @@ class WriteCharacteristic extends bleno.Characteristic {
               console.log(
                 `File "${savePath}" received and saved successfully.`,
               );
-              eventEmitter.emit('writeRequestReceived', { filePath: savePath });
+              bleEventEmitter.emit('writeRequestReceived', { filePath: savePath });
             }
           });
 
