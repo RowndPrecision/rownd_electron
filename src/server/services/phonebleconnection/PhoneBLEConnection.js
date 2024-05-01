@@ -101,7 +101,7 @@ class PhoneBLEConnection {
       },
       espData: (data) => {
         this.socket.emit('phoneble-esp:data', data);
-        bleEventEmitter.emit('esp-status', data);
+        notifyCharacteristic.sendNotification(data);
       },
       writeRequestReceived: (data) => {
         if (data.coordinates) {
