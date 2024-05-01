@@ -163,7 +163,7 @@ class DeviceConnections extends PureComponent {
 
         const espPort = this.state.ports[0];
         const computerPort = this.state.ports[1];
-        const baudrate = this.state.baudrate;
+        const baudrate = this.state.computerBaudrate;
 
         this.socket.emit('open', espPort, computerPort, baudrate, (connection) => {
           log.debug('open', JSON.stringify(espPort), JSON.stringify(computerPort), connection);
