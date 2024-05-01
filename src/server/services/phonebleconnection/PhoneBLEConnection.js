@@ -106,7 +106,7 @@ class PhoneBLEConnection {
         if (data.coordinates) {
           const { x, y } = data.coordinates;
           const defaultSpeed = 200;
-          const gCodeCommand = `$J = G21G91F${defaultSpeed}X-${x}Y${y}`;
+          const gCodeCommand = `$J = G21G91F${defaultSpeed}X${x}Z${y}`;
           this.sendCommandToESP(gCodeCommand);
         }
         if (data.filePath) {
