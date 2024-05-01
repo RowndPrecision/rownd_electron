@@ -26,6 +26,7 @@ class NotifyCharacteristic extends bleno.Characteristic {
   }
 
   onDataReceived(data) {
+    console.log(data, this.updateValueCallback, 'this.updateValueCallback');
     if (data) {
       const bufferData = Buffer.from(data);
       this.updateValueCallback && this.updateValueCallback(bufferData);

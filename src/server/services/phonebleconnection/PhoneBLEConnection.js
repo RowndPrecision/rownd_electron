@@ -218,7 +218,7 @@ class PhoneBLEConnection {
 
     close() {
       bleno.disconnect();
-      bleEventEmitter.on('writeRequestReceived', this.eventListener.writeRequestReceived);
+      bleEventEmitter.removeListener('writeRequestReceived', this.eventListener.writeRequestReceived);
     }
 
     sendCommandToESP(data) {
