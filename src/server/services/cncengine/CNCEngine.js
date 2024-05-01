@@ -137,8 +137,6 @@ class CNCEngine {
         path: '/socket.io'
       });
 
-      console.log(this.io);
-
       this.io.use(socketioJwt.authorize({
         secret: settings.secret,
         handshake: true

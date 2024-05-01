@@ -39,10 +39,6 @@ class ComputerConnection {
           this.connection = null;
         }
         this.close(err => {
-          // Remove controller from store
-          const port = this.port.port;
-          store.unset(`controllers[${JSON.stringify(port)}]`);
-
           if (this.connection) {
             this.connection = null;
           }

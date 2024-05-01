@@ -143,6 +143,7 @@ class DeviceConnections extends PureComponent {
         computerConnecting: false,
         computerConnected: false,
         computerBaudrate: 115200,
+        phoneBLEConnected: false,
         alertMessage: ''
       };
     }
@@ -187,6 +188,46 @@ class DeviceConnections extends PureComponent {
       this.socket.on('computer-esp:data', (data) => {
         log.debug('computer-esp:data', data);
       });
+    }
+
+    connectPhoneBLEConnectionSocket() {
+      this.socket && this.socket.disconnect();
+
+      const token = store.get('session.token');
+      const host = '';
+      const options = {
+        query: 'token=' + token,
+        path: '/phoneble-socket.io'
+      };
+      this.socket = io.connect(host, options);
+
+      this.socket.on('connect', () => {
+        log.debug('Socket.IO sunucusuna bağlantı kuruldu.');
+
+        const espPort = this.state.ports[0];
+
+        this.socket.emit('open', espPort, () => {
+          log.debug('open', JSON.stringify(espPort));
+          this.setState(state => ({
+            phoneBLEConnected: true
+          }));
+        });
+      });
+
+      // this.socket.on('computer:error', (err) => {
+      //   log.debug('computer:error', err);
+      // });
+
+      // this.socket.on('computer:close', (err) => {
+      //   log.debug('computer:close', err);
+      //   this.setState(state => ({
+      //     phoneBLEConnected: false
+      //   }));
+      // });
+
+      // this.socket.on('phoneble-esp:sendcommandesp', (data) => {
+      //   log.debug('phoneble-esp:sendcommandesp', data);
+      // });
     }
 
     addEspControllerEvents() {
@@ -282,7 +323,7 @@ class DeviceConnections extends PureComponent {
     }
 
     render() {
-      const { espConnected, alertMessage, espController, computerConnected } = this.state;
+      const { espConnected, alertMessage, espController, computerConnected, phoneBLEConnected } = this.state;
       const activeState = _.get(espController.state, 'status.activeState');
 
       const grblStateText = {
@@ -321,10 +362,12 @@ class DeviceConnections extends PureComponent {
           <ConnectedDevice
             className={styles.connectedDevice}
             deviceName="Phone"
-            isConnected={false}
+            isConnected={true}
             infoText="*For connect to phone please use your phone"
             isManualConnectable
-            onTapAction={() => {}}
+            onTapAction={() => {
+              this.connectPhoneBLEConnectionSocket();
+            }}
           />
           <ConnectedDevice
             className={styles.connectedDevice}

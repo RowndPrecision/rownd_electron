@@ -152,6 +152,7 @@
     "@trendmicro/react-tooltip": "~0.6.0",
     "@trendmicro/react-validation": "~0.1.0",
     "bcrypt-nodejs": "0.0.3",
+    "bleno": "npm:@abandonware/bleno@^0.6.1",
     "body-parser": "~1.18.3",
     "bootstrap": "~3.3.7",
     "chained-function": "~0.5.0",

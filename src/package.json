@@ -14,6 +14,7 @@
   "dependencies": {
     "@serialport/parser-readline": "^10.0.0",
     "bcrypt-nodejs": "0.0.3",
+    "bleno": "npm:@abandonware/bleno@^0.6.1",
     "body-parser": "~1.18.3",
     "chalk": "~2.4.2",
     "commander": "~9.1.0",
