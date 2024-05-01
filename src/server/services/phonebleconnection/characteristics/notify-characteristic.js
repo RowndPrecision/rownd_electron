@@ -16,16 +16,20 @@ class NotifyCharacteristic extends bleno.Characteristic {
     this.isSubscribed = true;
     this.updateValueCallback = updateValueCallback;
 
-    bleEventEmitter.on('phoneble-esp:data', (data) => {
-      const bufferData = Buffer.from(data);
-      updateValueCallback && this.updateValueCallback(bufferData);
-    });
+    bleEventEmitter.on('phoneble-esp:data', this.onDataReceived);
   }
 
   onUnsubscribe() {
     console.log('NotifyCharacteristic - onUnsubscribe');
     this.updateValueCallback = null;
-    bleEventEmitter.removeListener('phoneble-esp:data');
+    bleEventEmitter.removeListener('phoneble-esp:data', this.onDataReceived);
+  }
+
+  onDataReceived(data) {
+    if (data) {
+      const bufferData = Buffer.from(data);
+      this.updateValueCallback && this.updateValueCallback(bufferData);
+    }
   }
 }
 
