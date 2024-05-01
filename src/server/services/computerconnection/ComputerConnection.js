@@ -113,7 +113,7 @@ class ComputerConnection {
         });
 
         // Open serial port
-        socket.on('open', (espPort, port, callback = noop) => {
+        socket.on('open', (espPort, port, baudrate, callback = noop) => {
           if (typeof callback !== 'function') {
             callback = noop;
           }
@@ -129,7 +129,7 @@ class ComputerConnection {
 
           this.connection = new SerialConnection({
             path: port.port,
-            baudRate: 115200
+            baudRate: baudrate
           });
 
           this.open(espPort, port, (err) => {
@@ -146,6 +146,8 @@ class ComputerConnection {
           if (typeof callback !== 'function') {
             callback = noop;
           }
+
+          this.close();
 
           // Leave the room
           socket.leave(port);

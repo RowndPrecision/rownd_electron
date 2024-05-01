@@ -61,12 +61,10 @@ class DeviceConnections extends PureComponent {
         });
       },
       'serialport:change': (options) => {
-        console.log('serialport:change', options);
         log.debug('serialport:change', options); // TODO: Port Değişikliği
       },
       'serialport:open': (options) => {
         log.debug('serialport:open', options);
-        console.log('serialport:open', options);
         const { controllerType, port, baudrate, controllerState } = options;
 
         this.setState(state => ({
@@ -122,41 +120,11 @@ class DeviceConnections extends PureComponent {
 
     componentDidMount() {
       this.addEspControllerEvents();
-      //this.espRefreshPorts();
-
-      this.socket && this.socket.destroy();
-      const token = store.get('session.token');
-      const host = '';
-      const options = {
-        query: 'token=' + token,
-        path: '/computer-socket.io'
-      };
-      this.socket = io.connect(host, options);
-
-      this.socket.on('connect', () => {
-        console.log('Socket.IO sunucusuna bağlantı kuruldu.');
-      });
-
-      this.socket.on('computer:data', (data, err, state) => {
-        console.log('computer:data', data, err, state);
-      });
-
-      this.socket.on('computer:error', (err) => {
-        console.log('computer:error', err);
-      });
-
-      this.socket.on('computer:close', (err) => {
-        console.log('computer:close', err);
-      });
-
-      this.socket.on('computer-esp:data', (data) => {
-        console.log('computer-esp:data', data);
-      });
+      this.espRefreshPorts();
     }
 
     componentWillUnmount() {
       this.removeEspControllerEvents();
-      this.socket.disconnect();
     }
 
     getInitialState() {
@@ -172,8 +140,53 @@ class DeviceConnections extends PureComponent {
         },
         espPort: espController.port,
         espBaudrate: 115200,
+        computerConnecting: false,
+        computerConnected: false,
+        computerBaudrate: 115200,
         alertMessage: ''
       };
+    }
+
+    connectComputerConnectionSocket() {
+      this.socket && this.socket.disconnect();
+
+      const token = store.get('session.token');
+      const host = '';
+      const options = {
+        query: 'token=' + token,
+        path: '/computer-socket.io'
+      };
+      this.socket = io.connect(host, options);
+
+      this.socket.on('connect', () => {
+        log.debug('Socket.IO sunucusuna bağlantı kuruldu.');
+
+        const espPort = this.state.ports[0];
+        const computerPort = this.state.ports[1];
+        const baudrate = this.state.baudrate;
+
+        this.socket.emit('open', espPort, computerPort, baudrate, (connection) => {
+          log.debug('open', JSON.stringify(espPort), JSON.stringify(computerPort), connection);
+          this.setState(state => ({
+            computerConnected: true
+          }));
+        });
+      });
+
+      this.socket.on('computer:error', (err) => {
+        log.debug('computer:error', err);
+      });
+
+      this.socket.on('computer:close', (err) => {
+        log.debug('computer:close', err);
+        this.setState(state => ({
+          computerConnected: false
+        }));
+      });
+
+      this.socket.on('computer-esp:data', (data) => {
+        log.debug('computer-esp:data', data);
+      });
     }
 
     addEspControllerEvents() {
@@ -269,7 +282,7 @@ class DeviceConnections extends PureComponent {
     }
 
     render() {
-      const { espConnected, alertMessage, espController } = this.state;
+      const { espConnected, alertMessage, espController, computerConnected } = this.state;
       const activeState = _.get(espController.state, 'status.activeState');
 
       const grblStateText = {
@@ -324,23 +337,11 @@ class DeviceConnections extends PureComponent {
           <ConnectedDevice
             className={styles.connectedDevice}
             deviceName="Computer"
-            isConnected={true}
+            isConnected={computerConnected}
             infoText="*For connect to computer please use your computer"
             isManualConnectable={true}
             onTapAction={() => {
-              const espPort = this.state.ports[0];
-              const computerPort = this.state.ports[1];
-
-              this.socket.emit('open', espPort, computerPort, (connection) => {
-                console.log('open', espPort, computerPort, connection);
-              });
-              // api.computer.connect(this.state.espPort)
-              //   .then((res) => {
-              //     const { data } = res.body;
-              //     console.log(data);
-              //   })
-              //   .catch((res) => {
-              //   });
+              this.connectComputerConnectionSocket();
             }}
           />
         </div>
