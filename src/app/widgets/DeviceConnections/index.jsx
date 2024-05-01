@@ -88,7 +88,6 @@ class DeviceConnections extends PureComponent {
         }));
 
         log.debug(`Established a connection to the serial port "${port}"`);
-        
       },
       'serialport:close': (options) => {
         const { port } = options;
