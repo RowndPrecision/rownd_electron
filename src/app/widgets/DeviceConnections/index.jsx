@@ -27,7 +27,9 @@ class DeviceConnections extends PureComponent {
 
     state = this.getInitialState();
 
-    socket = null;
+    computerConnectionSocket = null;
+
+    phoneBLEConnectionSocket = null;
 
     espControllerEvents = {
       'serialport:list': (ports) => {
@@ -121,6 +123,7 @@ class DeviceConnections extends PureComponent {
     componentDidMount() {
       this.addEspControllerEvents();
       this.espRefreshPorts();
+      this.connectPhoneBLEConnectionSocket();
     }
 
     componentWillUnmount() {
@@ -149,7 +152,7 @@ class DeviceConnections extends PureComponent {
     }
 
     connectComputerConnectionSocket() {
-      this.socket && this.socket.disconnect();
+      this.computerConnectionSocket && this.computerConnectionSocket.disconnect();
 
       const token = store.get('session.token');
       const host = '';
@@ -159,14 +162,14 @@ class DeviceConnections extends PureComponent {
       };
       this.socket = io.connect(host, options);
 
-      this.socket.on('connect', () => {
+      this.computerConnectionSocket.on('connect', () => {
         log.debug('Socket.IO sunucusuna bağlantı kuruldu.');
 
         const espPort = this.state.ports[0];
         const computerPort = this.state.ports[1];
         const baudrate = this.state.computerBaudrate;
 
-        this.socket.emit('open', espPort, computerPort, baudrate, (connection) => {
+        this.computerConnectionSocket.emit('open', espPort, computerPort, baudrate, (connection) => {
           log.debug('open', JSON.stringify(espPort), JSON.stringify(computerPort), connection);
           this.setState(state => ({
             computerConnected: true
@@ -174,24 +177,24 @@ class DeviceConnections extends PureComponent {
         });
       });
 
-      this.socket.on('computer:error', (err) => {
+      this.computerConnectionSocket.on('computer:error', (err) => {
         log.debug('computer:error', err);
       });
 
-      this.socket.on('computer:close', (err) => {
+      this.computerConnectionSocket.on('computer:close', (err) => {
         log.debug('computer:close', err);
         this.setState(state => ({
           computerConnected: false
         }));
       });
 
-      this.socket.on('computer-esp:data', (data) => {
+      this.computerConnectionSocket.on('computer-esp:data', (data) => {
         log.debug('computer-esp:data', data);
       });
     }
 
     connectPhoneBLEConnectionSocket() {
-      this.socket && this.socket.disconnect();
+      this.phoneBLEConnectionSocket && this.phoneBLEConnectionSocket.disconnect();
 
       const token = store.get('session.token');
       const host = '';
@@ -201,34 +204,27 @@ class DeviceConnections extends PureComponent {
       };
       this.socket = io.connect(host, options);
 
-      this.socket.on('connect', () => {
+      this.phoneBLEConnectionSocket.on('connect', () => {
         log.debug('Socket.IO sunucusuna bağlantı kuruldu.');
 
         const espPort = this.state.ports[0];
 
-        this.socket.emit('open', espPort, () => {
+        this.phoneBLEConnectionSocket.emit('open', espPort, () => {
           log.debug('open', JSON.stringify(espPort));
-          this.setState(state => ({
-            phoneBLEConnected: true
-          }));
         });
       });
 
-      this.socket.on('cphoneble:connect', (err) => {
+      this.phoneBLEConnectionSocket.on('phoneble:connect', (clientAddress) => {
         this.setState(state => ({
-          phoneBLEConnected: !err
+          phoneBLEConnected: true
         }));
       });
 
-      this.socket.on('phoneble:disconnect', (clientAddress) => {
+      this.phoneBLEConnectionSocket.on('phoneble:disconnect', (clientAddress) => {
         this.setState(state => ({
           phoneBLEConnected: false
         }));
       });
-
-      // this.socket.on('phoneble-esp:sendcommandesp', (data) => {
-      //   log.debug('phoneble-esp:sendcommandesp', data);
-      // });
     }
 
     addEspControllerEvents() {
@@ -365,10 +361,8 @@ class DeviceConnections extends PureComponent {
             deviceName="Phone"
             isConnected={phoneBLEConnected}
             infoText="*For connect to phone please use your phone"
-            isManualConnectable
-            onTapAction={() => {
-              this.connectPhoneBLEConnectionSocket();
-            }}
+            isManualConnectable={false}
+            onTapAction={() => {}}
           />
           <ConnectedDevice
             className={styles.connectedDevice}

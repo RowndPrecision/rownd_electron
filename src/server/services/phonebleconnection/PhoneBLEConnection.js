@@ -85,12 +85,12 @@ class PhoneBLEConnection {
       },
       servicesSet: (error) => {
         console.log(`on -> servicesSet: ${error ? `error ${error}` : 'success'}`);
-        this.socket.emit('phoneble:connect', error);
       },
       servicesSetError: (error) => {
         console.log('servicesSetError:', error);
       },
       accept: (clientAddress) => {
+        this.socket.emit('phoneble:connect', clientAddress);
         console.log(`on -> accept, client: ${clientAddress}`);
         bleno.updateRssi();
       },
@@ -218,6 +218,7 @@ class PhoneBLEConnection {
 
     close() {
       bleno.disconnect();
+      bleEventEmitter.on('writeRequestReceived', this.eventListener.writeRequestReceived);
     }
 
     sendCommandToESP(data) {

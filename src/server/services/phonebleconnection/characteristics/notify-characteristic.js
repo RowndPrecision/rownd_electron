@@ -25,6 +25,7 @@ class NotifyCharacteristic extends bleno.Characteristic {
   onUnsubscribe() {
     console.log('NotifyCharacteristic - onUnsubscribe');
     this.updateValueCallback = null;
+    bleEventEmitter.removeListener('phoneble-esp:data');
   }
 }
 
