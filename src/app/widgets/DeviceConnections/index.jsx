@@ -323,7 +323,7 @@ class DeviceConnections extends PureComponent {
     }
 
     render() {
-      const { espConnected, alertMessage, espController, computerConnected, phoneBLEConnected } = this.state;
+      const { espConnected, alertMessage, espController, computerConnected } = this.state;
       const activeState = _.get(espController.state, 'status.activeState');
 
       const grblStateText = {

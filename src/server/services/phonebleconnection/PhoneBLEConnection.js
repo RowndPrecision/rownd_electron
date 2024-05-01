@@ -11,6 +11,7 @@ import {
 } from '../../access-control';
 
 const bleno = require('bleno');
+const eventEmitter = require('./event-emitter');
 
 const BlenoPrimaryService = bleno.PrimaryService;
 
@@ -101,6 +102,18 @@ class PhoneBLEConnection {
       espData: (data) => {
         this.socket.emit('phoneble-esp:data', data);
       },
+      writeRequestReceived: (data) => {
+        if (data.coordinates) {
+          const { x, y } = data.coordinates;
+          const defaultSpeed = 200;
+          const gCodeCommand = `$J = G21G91F${defaultSpeed}X-${x}Y${y}`;
+          this.sendCommandToESP(gCodeCommand);
+        }
+        if (data.filePath) {
+          const { filePath } = data;
+          console.log('geldim gördüm', filePath);
+        }
+      }
     };
 
     isOpen() {
@@ -197,6 +210,7 @@ class PhoneBLEConnection {
       bleno.on('servicesSet', this.eventListener.servicesSet);
       bleno.on('servicesSetError', this.eventListener.servicesSetError);
       bleno.on('rssiUpdate', this.eventListener.rssiUpdate);
+      eventEmitter.on('writeRequestReceived', this.eventListener.writeRequestReceived);
       //this.espController.connection.on('data', this.eventListener.espData);
     }
 
@@ -204,7 +218,7 @@ class PhoneBLEConnection {
       bleno.disconnect();
     }
 
-    sendCommandESP(data) {
+    sendCommandToESP(data) {
       this.espController.command('gcode', data, (err, state) => {
         this.socket.emit('phoneble-esp:sendcommandesp', data, err, state);
       });
