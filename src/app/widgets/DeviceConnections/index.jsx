@@ -83,6 +83,8 @@ class DeviceConnections extends PureComponent {
         }));
 
         log.debug(`Established a connection to the serial port "${port}"`);
+        this.connectPhoneBLEConnectionSocket();
+        this.connectComputerConnectionSocket();
       },
       'serialport:close': (options) => {
         const { port } = options;
@@ -123,7 +125,6 @@ class DeviceConnections extends PureComponent {
     componentDidMount() {
       this.addEspControllerEvents();
       this.espRefreshPorts();
-      this.connectPhoneBLEConnectionSocket();
     }
 
     componentWillUnmount() {
@@ -160,7 +161,7 @@ class DeviceConnections extends PureComponent {
         query: 'token=' + token,
         path: '/computer-socket.io'
       };
-      this.socket = io.connect(host, options);
+      this.computerConnectionSocket = io.connect(host, options);
 
       this.computerConnectionSocket.on('connect', () => {
         log.debug('Socket.IO sunucusuna bağlantı kuruldu.');
@@ -202,7 +203,7 @@ class DeviceConnections extends PureComponent {
         query: 'token=' + token,
         path: '/phoneble-socket.io'
       };
-      this.socket = io.connect(host, options);
+      this.phoneBLEConnectionSocket = io.connect(host, options);
 
       this.phoneBLEConnectionSocket.on('connect', () => {
         log.debug('Socket.IO sunucusuna bağlantı kuruldu.');
@@ -377,10 +378,8 @@ class DeviceConnections extends PureComponent {
             deviceName="Computer"
             isConnected={computerConnected}
             infoText="*For connect to computer please use your computer"
-            isManualConnectable={true}
-            onTapAction={() => {
-              this.connectComputerConnectionSocket();
-            }}
+            isManualConnectable={false}
+            onTapAction={() => {}}
           />
         </div>
       );
