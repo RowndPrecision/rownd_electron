@@ -324,7 +324,7 @@ class DeviceConnections extends PureComponent {
     }
 
     render() {
-      const { espConnected, alertMessage, espController, computerConnected } = this.state;
+      const { espConnected, alertMessage, espController, computerConnected, phoneBLEConnected } = this.state;
       const activeState = _.get(espController.state, 'status.activeState');
 
       const grblStateText = {
@@ -363,7 +363,7 @@ class DeviceConnections extends PureComponent {
           <ConnectedDevice
             className={styles.connectedDevice}
             deviceName="Phone"
-            isConnected={true}
+            isConnected={phoneBLEConnected}
             infoText="*For connect to phone please use your phone"
             isManualConnectable
             onTapAction={() => {
