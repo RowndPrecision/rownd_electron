@@ -24,8 +24,8 @@ class NotifyCharacteristic extends bleno.Characteristic {
   }
 
   sendNotification(data) {
-    console.log(data);
-    if (this.isSubscribed && this.updateValueCallback && data != null) {
+    if (this.isSubscribed && this.updateValueCallback && data) {
+      console.log(data);
       const data = Buffer.from(data);
       this.updateValueCallback(data);
     }

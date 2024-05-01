@@ -214,16 +214,17 @@ class DeviceConnections extends PureComponent {
         });
       });
 
-      // this.socket.on('computer:error', (err) => {
-      //   log.debug('computer:error', err);
-      // });
+      this.socket.on('cphoneble:connect', (err) => {
+        this.setState(state => ({
+          phoneBLEConnected: !err
+        }));
+      });
 
-      // this.socket.on('computer:close', (err) => {
-      //   log.debug('computer:close', err);
-      //   this.setState(state => ({
-      //     phoneBLEConnected: false
-      //   }));
-      // });
+      this.socket.on('phoneble:disconnect', (clientAddress) => {
+        this.setState(state => ({
+          phoneBLEConnected: false
+        }));
+      });
 
       // this.socket.on('phoneble-esp:sendcommandesp', (data) => {
       //   log.debug('phoneble-esp:sendcommandesp', data);

@@ -85,6 +85,7 @@ class PhoneBLEConnection {
       },
       servicesSet: (error) => {
         console.log(`on -> servicesSet: ${error ? `error ${error}` : 'success'}`);
+        this.socket.emit('phoneble:connect', error);
       },
       servicesSetError: (error) => {
         console.log('servicesSetError:', error);
@@ -95,6 +96,7 @@ class PhoneBLEConnection {
       },
       disconnect: (clientAddress) => {
         console.log(`on -> disconnect, client: ${clientAddress}`);
+        this.socket.emit('phoneble:disconnect', clientAddress);
       },
       rssiUpdate: (rssi) => {
         console.log(`on -> rssiUpdate: ${rssi}`);
