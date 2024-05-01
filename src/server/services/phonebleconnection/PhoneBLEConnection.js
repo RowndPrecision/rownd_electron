@@ -11,6 +11,7 @@ import {
 } from '../../access-control';
 
 const bleno = require('bleno');
+const fs = require('fs');
 const bleEventEmitter = require('./event-emitter');
 
 const BlenoPrimaryService = bleno.PrimaryService;
@@ -113,7 +114,7 @@ class PhoneBLEConnection {
         }
         if (data.filePath) {
           const { filePath } = data;
-          console.log('geldim gördüm', filePath);
+          this.sendGCodeFileToESP(filePath);
         }
       }
     };
@@ -224,6 +225,28 @@ class PhoneBLEConnection {
     sendCommandToESP(data) {
       this.espController.command('gcode', data, (err, state) => {
         this.socket.emit('phoneble-esp:sendcommandesp', data, err, state);
+      });
+    }
+
+    sendGCodeFileToESP(filePath) {
+      fs.readFile(filePath, 'utf8', (err, fileContent) => {
+        if (err) {
+          console.error('Dosya okunurken bir hata oluştu:', err);
+          return;
+        }
+
+        const path = require('path');
+        const fileName = path.basename(filePath);
+        const context = {};
+
+        this.espController.command('gcode:load', fileName, fileContent, context, (err, data) => {
+          if (err) {
+            log.error(err);
+            return;
+          }
+
+          log.debug(data); // TODO
+        });
       });
     }
 }
