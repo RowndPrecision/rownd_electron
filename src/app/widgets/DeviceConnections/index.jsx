@@ -69,6 +69,11 @@ class DeviceConnections extends PureComponent {
         log.debug('serialport:open', options);
         const { controllerType, port, baudrate, controllerState } = options;
 
+        if (!this.state.espConnected) {
+          this.connectPhoneBLEConnectionSocket();
+          this.connectComputerConnectionSocket();
+        }
+
         this.setState(state => ({
           alertMessage: '',
           espConnecting: false,
@@ -83,8 +88,7 @@ class DeviceConnections extends PureComponent {
         }));
 
         log.debug(`Established a connection to the serial port "${port}"`);
-        this.connectPhoneBLEConnectionSocket();
-        this.connectComputerConnectionSocket();
+        
       },
       'serialport:close': (options) => {
         const { port } = options;
