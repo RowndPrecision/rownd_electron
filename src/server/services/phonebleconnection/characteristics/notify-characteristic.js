@@ -8,6 +8,8 @@ class NotifyCharacteristic extends bleno.Characteristic {
       uuid,
       properties: ['notify'],
     });
+
+    this.onDataReceived = this.onDataReceived.bind(this);
   }
 
   onSubscribe(maxValueSize, updateValueCallback) {
@@ -22,7 +24,7 @@ class NotifyCharacteristic extends bleno.Characteristic {
   onUnsubscribe() {
     console.log('NotifyCharacteristic - onUnsubscribe');
     this.updateValueCallback = null;
-    bleEventEmitter.removeListener('phoneble-esp:data', this.onDataReceived);
+    bleEventEmitter.off('phoneble-esp:data', this.onDataReceived);
   }
 
   onDataReceived(data) {
