@@ -663,24 +663,6 @@ machines.run = (id) => new Promise((resolve, reject) => {
     });
 });
 
-//
-// Machines
-//
-const computer = {};
-
-computer.connect = (espPort) => new Promise((resolve, reject) => {
-  authrequest
-    .post('/api/computer/connect')
-    .send({ espPort: espPort })
-    .end((err, res) => {
-      if (err) {
-        reject(res);
-      } else {
-        resolve(res);
-      }
-    });
-});
-
 
 export default {
   getLatestVersion,
@@ -710,8 +692,5 @@ export default {
   machines,
   macros,
   mdi,
-  users,
-
-  // Other Device Connectionsü
-  computer
+  users
 };

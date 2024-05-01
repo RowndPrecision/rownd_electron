@@ -238,6 +238,7 @@ const createServer = (options, callback) => {
       // cncengine service
       cncengine.start(server, options.controller || config.get('controller', ''));
 
+      // computerconnection service
       computerconnection.start(server);
 
       const address = server.address().address;
