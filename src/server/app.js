@@ -318,6 +318,12 @@ const appMain = () => {
     app.post(urljoin(settings.route, 'api/watch/files'), api.watch.getFiles);
     app.get(urljoin(settings.route, 'api/watch/file'), api.watch.readFile);
     app.post(urljoin(settings.route, 'api/watch/file'), api.watch.readFile);
+
+    // Gamepad Bluetooth Connection
+    app.get(urljoin(settings.route, 'api/gamepad/run-process'), api.gamepad.runProcess);
+    app.get(urljoin(settings.route, 'api/gamepad/remove-all-devices'), api.gamepad.removeAllDevices);
+    app.get(urljoin(settings.route, 'api/gamepad/scan-and-pair'), api.gamepad.scanAndPair);
+    app.get(urljoin(settings.route, 'api/gamepad/kill-process'), api.gamepad.killProcess);
   }
 
   // page

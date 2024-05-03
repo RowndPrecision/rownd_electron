@@ -119,14 +119,6 @@ class PhoneBLEConnection {
       }
     };
 
-    isOpen() {
-
-    }
-
-    isClose() {
-
-    }
-
     start(server) {
       this.server = server;
       this.io = socketIO(this.server, {
@@ -248,6 +240,10 @@ class PhoneBLEConnection {
           log.debug(data); // TODO
         });
       });
+    }
+
+    stop() {
+      this.close();
     }
 }
 

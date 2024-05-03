@@ -5,6 +5,7 @@ import _ from 'lodash';
 import log from 'app/lib/log';
 import i18n from 'app/lib/i18n';
 import store from 'app//store';
+import api from 'app/api';
 //import api from 'app/api';
 import espController from 'app/lib/controller';
 import { ToastNotification } from 'app/components/Notifications';
@@ -20,6 +21,7 @@ import { GRBL,
 import io from 'socket.io-client';
 import styles from './index.styl';
 import ConnectedDevice from './ConnectedDevice';
+import GamepadConnection from './GamepadConnection';
 
 class DeviceConnections extends PureComponent {
     static propTypes = {
@@ -30,6 +32,10 @@ class DeviceConnections extends PureComponent {
     computerConnectionSocket = null;
 
     phoneBLEConnectionSocket = null;
+
+    gamepadBLEConnectionSocket = null;
+
+    gamepadConnection = new GamepadConnection();
 
     espControllerEvents = {
       'serialport:list': (ports) => {
@@ -151,8 +157,55 @@ class DeviceConnections extends PureComponent {
         computerConnected: false,
         computerBaudrate: 115200,
         phoneBLEConnected: false,
+        gamepadConnected: false,
         alertMessage: ''
       };
+    }
+
+    connectGamepadConnectionSocket() {
+      // api.gamepadBLE.runProcess({})
+      //   .then((res) => {
+      //     console.log('calistiiiiiiii', res);
+      //   })
+      //   .catch((res) => {
+      //   });
+
+
+      this.gamepadBLEConnectionSocket && this.gamepadBLEConnectionSocket.disconnect();
+
+      const token = store.get('session.token');
+      const host = '';
+      const options = {
+        query: 'token=' + token,
+        path: '/gamepad-socket.io'
+      };
+      this.gamepadBLEConnectionSocket = io.connect(host, options);
+
+      this.gamepadBLEConnectionSocket.on('connect', () => {
+        log.debug('Socket.IO Gamepad sunucusuna bağlantı kuruldu.');
+
+        this.gamepadBLEConnectionSocket.emit('open', () => {});
+      });
+
+      this.gamepadBLEConnectionSocket.on('gamepad:bleconnected', (isConnected) => {
+        if (isConnected) {
+          this.gamepadConnection.start();
+        } else {
+          this.gamepadConnection.stop();
+        }
+      });
+
+      this.gamepadConnection.on('gamepad:connect', (gamepad) => {
+        this.setState(state => ({
+          gamepadConnected: true
+        }));
+      });
+      this.gamepadConnection.on('gamepad:disconnect', (gamepad) => {
+        this.setState(state => ({
+          gamepadConnected: false
+        }));
+        this.gamepadBLEConnectionSocket.emit('gamepad:removealldevices', () => {});
+      });
     }
 
     connectComputerConnectionSocket() {
@@ -167,7 +220,7 @@ class DeviceConnections extends PureComponent {
       this.computerConnectionSocket = io.connect(host, options);
 
       this.computerConnectionSocket.on('connect', () => {
-        log.debug('Socket.IO sunucusuna bağlantı kuruldu.');
+        log.debug('Socket.IO Computer sunucusuna bağlantı kuruldu.');
 
         const espPort = this.state.ports[0];
         const computerPort = this.state.ports[1];
@@ -209,7 +262,7 @@ class DeviceConnections extends PureComponent {
       this.phoneBLEConnectionSocket = io.connect(host, options);
 
       this.phoneBLEConnectionSocket.on('connect', () => {
-        log.debug('Socket.IO sunucusuna bağlantı kuruldu.');
+        log.debug('Socket.IO Phone BLE sunucusuna bağlantı kuruldu.');
 
         const espPort = this.state.ports[0];
 
@@ -324,7 +377,7 @@ class DeviceConnections extends PureComponent {
     }
 
     render() {
-      const { espConnected, alertMessage, espController, computerConnected, phoneBLEConnected } = this.state;
+      const { espConnected, alertMessage, espController, computerConnected, phoneBLEConnected, gamepadConnected } = this.state;
       const activeState = _.get(espController.state, 'status.activeState');
 
       const grblStateText = {
@@ -371,10 +424,12 @@ class DeviceConnections extends PureComponent {
           <ConnectedDevice
             className={styles.connectedDevice}
             deviceName="Gamepad"
-            isConnected={false}
+            isConnected={gamepadConnected}
             infoText="*For connect to phone please use your gamepad"
             isManualConnectable={true}
-            onTapAction={() => {}}
+            onTapAction={() => {
+              this.connectGamepadConnectionSocket();
+            }}
           />
           <ConnectedDevice
             className={styles.connectedDevice}

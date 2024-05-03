@@ -663,6 +663,62 @@ machines.run = (id) => new Promise((resolve, reject) => {
     });
 });
 
+//
+// Gamepad
+//
+const gamepadBLE = {};
+gamepadBLE.runProcess = (options) => new Promise((resolve, reject) => {
+  authrequest
+    .get('/api/gamepad/run-process')
+    .query(options)
+    .end((err, res) => {
+      if (err) {
+        reject(res);
+      } else {
+        resolve(res);
+      }
+    });
+});
+
+gamepadBLE.removeAllDevices = (options) => new Promise((resolve, reject) => {
+  authrequest
+    .get('/api/gamepad/remove-all-devices')
+    .query(options)
+    .end((err, res) => {
+      if (err) {
+        reject(res);
+      } else {
+        resolve(res);
+      }
+    });
+});
+
+gamepadBLE.scanAndPair = (options) => new Promise((resolve, reject) => {
+  authrequest
+    .get('/api/gamepad/scan-and-pair')
+    .query(options)
+    .end((err, res) => {
+      if (err) {
+        reject(res);
+      } else {
+        resolve(res);
+      }
+    });
+});
+
+gamepadBLE.killProcess = (options) => new Promise((resolve, reject) => {
+  authrequest
+    .get('/api/gamepad/kill-process')
+    .query(options)
+    .end((err, res) => {
+      if (err) {
+        reject(res);
+      } else {
+        resolve(res);
+      }
+    });
+});
+
 
 export default {
   getLatestVersion,
@@ -692,5 +748,6 @@ export default {
   machines,
   macros,
   mdi,
-  users
+  users,
+  gamepadBLE
 };
