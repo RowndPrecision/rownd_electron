@@ -1,7 +1,7 @@
 import noop from 'lodash/noop';
 import { exec } from 'child_process';
 import socketIO from 'socket.io';
-import path from 'path';
+//import path from 'path';
 import socketioJwt from 'socketio-jwt';
 import settings from '../../config/settings';
 import logger from '../../lib/logger';
