@@ -135,6 +135,17 @@ class DeviceConnections extends PureComponent {
       this.espRefreshPorts();
 
       this.gamepadConnection.start();
+
+      this.gamepadConnection.on('gamepad:connect', (gamepad) => {
+        this.setState(state => ({
+          gamepadConnected: true
+        }));
+      });
+      this.gamepadConnection.on('gamepad:disconnect', (gamepad) => {
+        this.setState(state => ({
+          gamepadConnected: false
+        }));
+      });
     }
 
     componentWillUnmount() {
