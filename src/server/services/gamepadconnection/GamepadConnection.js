@@ -1,6 +1,7 @@
 import noop from 'lodash/noop';
-import { spawn } from 'child_process';
+import { exec } from 'child_process';
 import socketIO from 'socket.io';
+import path from 'path';
 import socketioJwt from 'socketio-jwt';
 import settings from '../../config/settings';
 import logger from '../../lib/logger';
@@ -128,11 +129,26 @@ class GamepadConnection {
     }
 
     open() {
-      const scriptPath = './scripts/btScan.py';
-      this.process = spawn('python3', [scriptPath]);
-      this.process.stdout.on('data', this.eventListener.processSuccess);
-      this.process.stderr.on('data', this.eventListener.processError);
-      this.process.stderr.on('close', this.eventListener.processClose);
+    //   const scriptPath = path.join(__dirname, './scripts/btScan.py');
+    //   console.log('scriptPath', scriptPath);
+    //   this.process = spawn('python3', [scriptPath]);
+    //   this.process.stdin.write('scanAndPair\n');
+    //   this.process.stdout.on('data', this.eventListener.processSuccess);
+    //   this.process.stderr.on('data', this.eventListener.processError);
+    //   this.process.stderr.on('close', this.eventListener.processClose);
+
+      const command = 'gnome-control-center bluetooth'; // GNOME için örnek
+
+      exec(command, (err, stdout, stderr) => {
+        if (err) {
+          // Bir hata olursa, burada ele alın.
+          console.error('Bir hata meydana geldi:', err);
+          return;
+        }
+
+        // Komut başarıyla çalıştıysa çıktıyı loglayabilirsiniz
+        console.log(stdout);
+      });
     }
 
     close() {}

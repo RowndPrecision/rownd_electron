@@ -1,20 +1,17 @@
-import { spawn } from 'child_process';
+import { exec } from 'child_process';
 
 export const runProcess = (req, res) => {
-  const scriptPath = '../scripts/btScan.py';
-  const process = spawn('python3', [scriptPath]);
-  console.log(process);
-
-  process.stdout.on('data', (data) => {
-    console.log('başladıııı');
-    if (data.includes('Successfully connected to device')) {
-      res.send({ bleconnected: true });
+  const command = 'blueman-manager';
+  exec(command, (err, stdout, stderr) => {
+    if (err) {
+      // Bir hata olursa, burada ele alın.
+      console.error('Bir hata meydana geldi:', err);
+      return;
     }
-  });
-  // this.process.stderr.on('data', this.eventListener.processError);
-  // this.process.stderr.on('close', this.eventListener.processClose);
 
-  // res.send({});
+    // Komut başarıyla çalıştıysa çıktıyı loglayabilirsiniz (genellikle boş olacaktır)
+    console.log(stdout);
+  });
 };
 
 
