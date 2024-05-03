@@ -5,7 +5,6 @@ import _ from 'lodash';
 import log from 'app/lib/log';
 import i18n from 'app/lib/i18n';
 import store from 'app//store';
-import api from 'app/api';
 //import api from 'app/api';
 import espController from 'app/lib/controller';
 import { ToastNotification } from 'app/components/Notifications';
