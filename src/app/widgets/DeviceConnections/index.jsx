@@ -5,7 +5,7 @@ import _ from 'lodash';
 import log from 'app/lib/log';
 import i18n from 'app/lib/i18n';
 import store from 'app//store';
-//import api from 'app/api';
+import api from 'app/api';
 import espController from 'app/lib/controller';
 import { ToastNotification } from 'app/components/Notifications';
 import { GRBL,
@@ -133,10 +133,14 @@ class DeviceConnections extends PureComponent {
     componentDidMount() {
       this.addEspControllerEvents();
       this.espRefreshPorts();
+
+      this.gamepadConnection.start();
     }
 
     componentWillUnmount() {
       this.removeEspControllerEvents();
+
+      this.gamepadConnection.stop();
     }
 
     getInitialState() {
@@ -162,49 +166,52 @@ class DeviceConnections extends PureComponent {
     }
 
     connectGamepadConnectionSocket() {
-      // api.gamepadBLE.runProcess({})
-      //   .then((res) => {
-      //     console.log('calistiiiiiiii', res);
-      //   })
-      //   .catch((res) => {
+      api.gamepadBLE.runProcess({})
+        .then((res) => {
+          console.log('calistiiiiiiii', res);
+        })
+        .catch((res) => {
+        });
+
+      // this.gamepadBLEConnectionSocket && this.gamepadBLEConnectionSocket.disconnect();
+
+      // const token = store.get('session.token');
+      // const host = '';
+      // const options = {
+      //   query: 'token=' + token,
+      //   path: '/gamepad-socket.io'
+      // };
+      // this.gamepadBLEConnectionSocket = io.connect(host, options);
+
+      // this.gamepadBLEConnectionSocket.on('connect', () => {
+      //   log.debug('Socket.IO Gamepad sunucusuna bağlantı kuruldu.');
+
+      //   this.gamepadBLEConnectionSocket.emit('open', () => {
+      //     this.computerConnectionSocket.emit('gamepad:scanandpair', () => {
+
+      //     });
       //   });
+      // });
 
+      // this.gamepadBLEConnectionSocket.on('gamepad:bleconnected', (isConnected) => {
+      //   if (isConnected) {
+      //     this.gamepadConnection.start();
+      //   } else {
+      //     this.gamepadConnection.stop();
+      //   }
+      // });
 
-      this.gamepadBLEConnectionSocket && this.gamepadBLEConnectionSocket.disconnect();
-
-      const token = store.get('session.token');
-      const host = '';
-      const options = {
-        query: 'token=' + token,
-        path: '/gamepad-socket.io'
-      };
-      this.gamepadBLEConnectionSocket = io.connect(host, options);
-
-      this.gamepadBLEConnectionSocket.on('connect', () => {
-        log.debug('Socket.IO Gamepad sunucusuna bağlantı kuruldu.');
-
-        this.gamepadBLEConnectionSocket.emit('open', () => {});
-      });
-
-      this.gamepadBLEConnectionSocket.on('gamepad:bleconnected', (isConnected) => {
-        if (isConnected) {
-          this.gamepadConnection.start();
-        } else {
-          this.gamepadConnection.stop();
-        }
-      });
-
-      this.gamepadConnection.on('gamepad:connect', (gamepad) => {
-        this.setState(state => ({
-          gamepadConnected: true
-        }));
-      });
-      this.gamepadConnection.on('gamepad:disconnect', (gamepad) => {
-        this.setState(state => ({
-          gamepadConnected: false
-        }));
-        this.gamepadBLEConnectionSocket.emit('gamepad:removealldevices', () => {});
-      });
+      // this.gamepadConnection.on('gamepad:connect', (gamepad) => {
+      //   this.setState(state => ({
+      //     gamepadConnected: true
+      //   }));
+      // });
+      // this.gamepadConnection.on('gamepad:disconnect', (gamepad) => {
+      //   this.setState(state => ({
+      //     gamepadConnected: false
+      //   }));
+      //   this.gamepadBLEConnectionSocket.emit('gamepad:removealldevices', () => {});
+      // });
     }
 
     connectComputerConnectionSocket() {
