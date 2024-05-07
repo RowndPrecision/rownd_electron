@@ -51,10 +51,10 @@ class DeviceConnections extends PureComponent {
           if (port.manufacturer === espPortManufacturer) {
             this.setState(state => ({
               alertMessage: '',
-              espPort: port,
+              espPort: ports[0],
             }));
 
-            this.espOpenPort(port, {
+            this.espOpenPort(ports[0], {
               baudrate: espBaudrate
             });
 
@@ -69,6 +69,7 @@ class DeviceConnections extends PureComponent {
       },
       'serialport:change': (options) => {
         log.debug('serialport:change', options); // TODO: Port Değişikliği
+        espController.command('reset');
       },
       'serialport:open': (options) => {
         log.debug('serialport:open', options);
