@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import isElectron from 'is-electron';
 import PropTypes from 'prop-types';
 import ExpressionEvaluator from 'expr-eval';
 import i18n from 'app/lib/i18n';
@@ -519,10 +520,65 @@ class LoadFile extends PureComponent {
 
     fileInputEl = null;
 
-    handleClickUpload = (event) => {
-      this.fileInputEl.value = null;
-      this.fileInputEl.click();
+    handleClickUpload = async (event) => {
+      // Check whether the code is running in Electron renderer process
+      if (isElectron()) {
+        const { ipcRenderer } = window.require('electron');
+        const filePaths = await ipcRenderer.invoke('open-file-dialog');
+        if (filePaths.length > 0) {
+          this.readFile(filePaths[0]);
+        }
+      } else {
+        this.fileInputEl.value = null;
+        this.fileInputEl.click();
+      }
     };
+
+    readFile(filePath) {
+      const fs = window.require('fs');
+      fs.readFile(filePath, (error, data) => {
+        if (error) {
+          log.error(error);
+          return;
+        }
+
+        const file = new File([data], filePath, { type: 'text/plain' });
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+          const { result, error } = event.target;
+
+          if (error) {
+            log.error(error);
+            return;
+          }
+
+          log.debug('FileReader:', pick(file, [
+            'lastModified',
+            'lastModifiedDate',
+            'meta',
+            'name',
+            'size',
+            'type'
+          ]));
+
+          const meta = {
+            name: file.name,
+            size: file.size
+          };
+          this.actions.uploadFile(result, meta);
+        };
+
+        reader.onerror = (event) => {
+          if (error) {
+            log.error(error);
+            return;
+          }
+        };
+
+        reader.readAsText(file);
+      });
+    }
 
     handleChangeFile = (event) => {
       const files = event.target.files;

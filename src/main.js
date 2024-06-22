@@ -4,6 +4,7 @@ import {
   BrowserWindow,
   Menu,
   app,
+  dialog,
   ipcMain,
   powerSaveBlocker,
   screen,
@@ -188,6 +189,13 @@ const showMainWindow = async () => {
     const configPath = path.join(userDataPath, 'cnc.json');
     fs.writeFileSync(configPath, content ?? '{}');
   });
+
+  ipcMain.handle('open-file-dialog', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      properties: ['openFile']
+    });
+    return result.filePaths;
+  });
 };
 
 // Increase V8 heap size of the main process in production
@@ -206,6 +214,8 @@ if (process.platform === 'linux') {
   // TODO: Maybe we can only disable --disable-setuid-sandbox
   // reference changes: https://github.com/microsoft/vscode/pull/122909/files
   app.commandLine.appendSwitch('--no-sandbox');
+  app.commandLine.appendSwitch('enable-logging');
+  app.commandLine.appendSwitch('v', 1);
 }
 
 /**

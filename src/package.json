@@ -1,6 +1,6 @@
 {
   "name": "cncjs-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "productName": "CNCjs",
   "description": "CNC Milling Controller",
   "homepage": "https://www.rowndcnc.com/",
@@ -11,10 +11,15 @@
     "url": "git@github.com:cncjs/cncjs.git"
   },
   "main": "main.js",
+  "permissions": [
+    {
+      "bluetooth": true
+    }
+  ],
   "dependencies": {
+    "@abandonware/bleno": "^0.6.1",
     "@serialport/parser-readline": "^10.0.0",
     "bcrypt-nodejs": "0.0.3",
-    "bleno": "npm:@abandonware/bleno@^0.6.1",
     "body-parser": "~1.18.3",
     "chalk": "~2.4.2",
     "commander": "~9.1.0",

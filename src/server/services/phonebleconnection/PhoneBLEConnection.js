@@ -10,7 +10,7 @@ import {
   validateUser
 } from '../../access-control';
 
-const bleno = require('bleno');
+const bleno = require('@abandonware/bleno');
 const fs = require('fs');
 const bleEventEmitter = require('./event-emitter');
 
@@ -18,9 +18,9 @@ const BlenoPrimaryService = bleno.PrimaryService;
 
 // Constants for the service and characteristic UUIDs
 const SERVICE_UUID = '27cf08c1-076a-41af-becd-02ed6f6109b9';
-const READ_CHARACTERISTIC_UUID = 'fd758b93-0bfa-4c52-8af0-85845a74a101';
-const WRITE_CHARACTERISTIC_UUID = 'fd758b93-0bfa-4c52-8af0-85845a74a102';
-const NOTIFY_CHARACTERISTIC_UUID = 'fd758b93-0bfa-4c52-8af0-85845a74a103';
+const READ_CHARACTERISTIC_UUID = 'a81d2e68-6b9a-4d24-bf0e-ee829f09b311';
+const WRITE_CHARACTERISTIC_UUID = 'ed50d118-53fd-4dc2-88b0-3c07f5a2a89a';
+const NOTIFY_CHARACTERISTIC_UUID = 'de2f08e3-f66c-4825-91e8-ace63bafed3d';
 
 const ReadCharacteristic = require('./characteristics/read-characteristic');
 const WriteCharacteristic = require('./characteristics/write-characteristic');
