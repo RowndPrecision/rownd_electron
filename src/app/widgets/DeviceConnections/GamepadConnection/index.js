@@ -77,7 +77,7 @@ class GamepadConnection extends EventEmitter {
     const yValue = axes[1] !== undefined ? axes[1].toFixed(4) * 1000 : null;
     const zValue = axes[3] !== undefined ? axes[3].toFixed(4) * 1000 : null;
 
-    const minThreshold = Math.abs(0.0300) * 1000; // Eşik değeri sabiti
+    const minThreshold = Math.abs(0.05) * 1000; // Eşik değeri sabiti
 
     let command = '$J=G21G91';
     let totalFeedRateSquared = 0; // Toplam besleme oranının karesi

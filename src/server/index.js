@@ -24,7 +24,7 @@ import config from './services/configstore';
 import { ensureString } from './lib/ensure-type';
 import logger, { setLevel } from './lib/logger';
 import urljoin from './lib/urljoin';
-import { computerconnection, gamepadconnection, phonebleconnection } from './services';
+import { computerconnection, phonebleconnection } from './services';
 
 const log = logger('init');
 
@@ -243,9 +243,6 @@ const createServer = (options, callback) => {
 
       // computerconnection service
       phonebleconnection.start(server);
-
-      // gamepadconnection service
-      gamepadconnection.start(server);
 
       const address = server.address().address;
       const port = server.address().port;

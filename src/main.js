@@ -25,6 +25,8 @@ let mainWindow = null;
 let powerId = 0;
 const store = new Store();
 
+const { spawn } = require('child_process');
+
 // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
 const gotSingleInstanceLock = app.requestSingleInstanceLock();
 const shouldQuitImmediately = !gotSingleInstanceLock;
@@ -195,6 +197,30 @@ const showMainWindow = async () => {
       properties: ['openFile']
     });
     return result.filePaths;
+  });
+
+  ipcMain.handle('run-python-script', (event) => {
+    return new Promise((resolve, reject) => {
+      const script = spawn('python3', [path.join(__dirname, 'bluetooth_gamepad_connect.py')]);
+
+      let scriptOutput = '';
+
+      script.stdout.on('data', (data) => {
+        scriptOutput += data.toString();
+      });
+
+      script.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`);
+      });
+
+      script.on('close', (code) => {
+        if (code === 0) {
+          resolve(scriptOutput);
+        } else {
+          reject(new Error('Script exited with non-zero code'));
+        }
+      });
+    });
   });
 };
 
