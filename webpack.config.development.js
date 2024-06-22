@@ -19,6 +19,10 @@ const publicPath = process.env.PUBLIC_PATH || '';
 const buildVersion = pkg.version;
 const timestamp = new Date().getTime();
 
+const crypto = require("crypto");
+const crypto_orig_createHash = crypto.createHash;
+crypto.createHash = algorithm => crypto_orig_createHash(algorithm == "md4" ? "sha256" : algorithm);
+
 module.exports = {
   mode: 'development',
   cache: true,

@@ -1,4 +1,4 @@
-const bleno = require('bleno');
+const bleno = require('@abandonware/bleno');
 const fs = require('fs');
 const path = require('path');
 const { Buffer } = require('buffer');
@@ -38,21 +38,22 @@ class WriteCharacteristic extends bleno.Characteristic {
       }
 
       if (header.type === 'file') {
-        if (this.receivedChunks === 0) {
-          this.receivedFileName = header.fileName;
-          this.expectedChunks = header.total;
-          console.log(
-            `Receiving "${this.receivedFileName}" in ${this.expectedChunks} chunks.`,
-          );
-        } else {
-          console.log(
-            `Received chunk ${this.receivedChunks} - Expected chunck  ${this.expectedChunks} ->  size ${data.length}`,
-          );
-          this.fileData = Buffer.concat([
-            this.fileData,
-            data.slice(headerEndIndex + 1),
-          ]);
+        if (this.receivedFileName !== header.fileName) {
+          this.resetFile();
         }
+
+        this.receivedFileName = header.fileName;
+        this.expectedChunks = header.total;
+        console.log(
+          `Receiving "${this.receivedFileName}" in ${this.expectedChunks} chunks.`,
+        );
+        console.log(
+          `Received chunk ${this.receivedChunks} - Expected chunck  ${this.expectedChunks} ->  size ${data.length}`,
+        );
+        this.fileData = Buffer.concat([
+          this.fileData,
+          data.slice(headerEndIndex + 1),
+        ]);
 
         // Acknowledge the write request.
         if (!withoutResponse) {
@@ -88,13 +89,17 @@ class WriteCharacteristic extends bleno.Characteristic {
           });
 
           // Reset state after file save.
-          this.receivedFileName = '';
-          this.fileData = Buffer.alloc(0);
-          this.receivedChunks = 0;
-          this.expectedChunks = 0;
+          this.resetFile();
         }
       }
     }
+  }
+
+  resetFile() {
+    this.receivedFileName = '';
+    this.fileData = Buffer.alloc(0);
+    this.receivedChunks = 0;
+    this.expectedChunks = 0;
   }
 }
 module.exports = WriteCharacteristic;

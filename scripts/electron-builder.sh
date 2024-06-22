@@ -23,12 +23,21 @@ rm -rf node_modules
 echo "Installing packages..."
 npm install --production
 npm dedupe
+
 popd
 
-echo "Rebuild native modules using electron ${electron_version}"
+npm run electron-rebuild 
+
+echo "Rebuild native module serialport using electron ${electron_version}"
 npm run electron-rebuild -- \
     --version=${electron_version:1} \
     --module-dir=dist/cncjs \
     --which-module=serialport
+
+echo "Rebuild native module bleno using electron ${electron_version}"
+npm run electron-rebuild -- \
+    --version=${electron_version:1} \
+    --module-dir=dist/cncjs \
+    --which-module=bleno
 
 cross-env USE_HARD_LINKS=false npm run electron-builder -- "$@"

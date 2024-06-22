@@ -1,6 +1,6 @@
 {
   "name": "cncjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The Ultimate CNC Lathe Machine Unleashing Your Creative Journey",
   "homepage": "https://www.rowndcnc.com/",
   "author": "Yakup Ad <yakup@rowndprecision.com>",
@@ -19,15 +19,12 @@
     "url": "git@github.com:cncjs/cncjs.git"
   },
   "license": "MIT",
-  "engines": {
-    "node": ">=14"
-  },
   "preferGlobal": true,
   "scripts": {
     "build": "yarn run build-prod",
     "build-latest": "bash scripts/build-latest.sh",
     "build-dev": "bash scripts/build-dev.sh",
-    "build-prod": "NODE_OPTIONS=--openssl-legacy-provider bash scripts/build-prod.sh",
+    "build-prod": "bash scripts/build-prod.sh",
     "clean": "del dist output",
     "electron": "electron",
     "electron-builder": "electron-builder",
@@ -41,7 +38,7 @@
     "build:linux": "NODE_OPTIONS=--openssl-legacy-provider bash -c 'scripts/electron-builder.sh --linux --x64 --arm64 --armv7l'",
     "build:linux-x64": "bash -c 'scripts/electron-builder.sh --linux --x64'",
     "build:linux-armv7l": "bash -c 'scripts/electron-builder.sh --linux --armv7l'",
-    "build:linux-arm64": "bash -c 'scripts/electron-builder.sh --linux --arm64'",
+    "build:linux-arm64": "cross-env DEBUG=electron-builder && bash -c 'scripts/electron-builder.sh --linux --arm64'",
     "build:windows": "bash -c 'scripts/electron-builder.sh --windows --x64'",
     "build:windows-x64": "bash -c 'scripts/electron-builder.sh --windows --x64'",
     "start-electron": "electron ./dist/cncjs/main",
@@ -56,7 +53,7 @@
     "stylint": "stylint src/app",
     "test": "tap test/*.js --no-timeout --node-arg=--require --node-arg=@babel/register --node-arg=--require --node-arg=@babel/polyfill",
     "coveralls": "tap test/*.js --coverage --coverage-report=text-lcov --nyc-arg=--require --nyc-arg=@babel/register --nyc-arg=--require --nyc-arg=@babel/polyfill",
-    "postinstall": "opencollective postinstall"
+    "postinstall": ""
   },
   "build": {
     "appId": "org.cncjs",
@@ -104,10 +101,11 @@
     "linux": {
       "category": "Utility",
       "target": [
-        "AppImage",
-        "deb",
-        "rpm"
+        "deb"
       ]
+    },
+    "deb": {
+      "afterInstall": "scripts/after-install.sh"
     }
   },
   "keywords": [
@@ -126,6 +124,7 @@
     "socket.io"
   ],
   "dependencies": {
+    "@abandonware/bleno": "^0.6.1",
     "@babel/polyfill": "~7.4.3",
     "@babel/runtime": "~7.4.3",
     "@serialport/parser-readline": "^10.0.0",
@@ -152,7 +151,6 @@
     "@trendmicro/react-tooltip": "~0.6.0",
     "@trendmicro/react-validation": "~0.1.0",
     "bcrypt-nodejs": "0.0.3",
-    "bleno": "npm:@abandonware/bleno@^0.6.1",
     "body-parser": "~1.18.3",
     "bootstrap": "~3.3.7",
     "chained-function": "~0.5.0",
@@ -280,6 +278,7 @@
     "@babel/preset-env": "~7.4.3",
     "@babel/preset-react": "~7.0.0",
     "@babel/register": "~7.4.0",
+    "@electron/rebuild": "^3.3.0",
     "@trendmicro/babel-config": "~1.0.2",
     "babel-core": "~7.0.0-bridge.0",
     "babel-eslint": "~10.0.1",
@@ -294,9 +293,8 @@
     "css-split-webpack-plugin": "~0.2.6",
     "del-cli": "~3.0.1",
     "dotenv": "~7.0.0",
-    "electron": "~22.0.3",
-    "electron-builder": "~23.6.0",
-    "electron-rebuild": "~3.2.7",
+    "electron": "~26.2.1",
+    "electron-builder": "~24.6.4",
     "eslint": "~5.16.0",
     "eslint-config-trendmicro": "~1.4.1",
     "eslint-import-resolver-webpack": "~0.11.1",
@@ -344,10 +342,6 @@
   "pre-push": [
     "eslint-debug"
   ],
-  "collective": {
-    "type": "opencollective",
-    "url": "https://opencollective.com/cncjs"
-  },
   "tap": {
     "check-coverage": true,
     "lines": 80,

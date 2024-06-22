@@ -22,6 +22,10 @@ const resolvedImports = findImports(files, {
 
 const deps = _uniq([
   '@serialport/parser-readline',
+  '@abandonware/bleno',
+  '@abandonware/bluetooth-hci-socket',
+  'serialport/bindings-cpp',
+  'usb',
   'core-js', // to polyfill ECMAScript features
   'regenerator-runtime', // needed to use transpiled generator functions
   'debug', // 'debug' is required for electron app
