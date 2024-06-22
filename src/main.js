@@ -193,9 +193,9 @@ const showMainWindow = async () => {
   ipcMain.handle('open-file-dialog', async () => {
     const result = await dialog.showOpenDialog(mainWindow, {
       properties: ['openFile']
-    })
+    });
     return result.filePaths;
-  })
+  });
 };
 
 // Increase V8 heap size of the main process in production

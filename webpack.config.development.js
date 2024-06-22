@@ -9,6 +9,7 @@ const stylusLoader = require('stylus-loader');
 const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const WriteFileWebpackPlugin = require('write-file-webpack-plugin');
+const crypto = require('crypto');
 const babelConfig = require('./babel.config');
 const buildConfig = require('./build.config');
 const pkg = require('./src/package.json');
@@ -19,9 +20,8 @@ const publicPath = process.env.PUBLIC_PATH || '';
 const buildVersion = pkg.version;
 const timestamp = new Date().getTime();
 
-const crypto = require("crypto");
-const crypto_orig_createHash = crypto.createHash;
-crypto.createHash = algorithm => crypto_orig_createHash(algorithm == "md4" ? "sha256" : algorithm);
+const cryptoOrigCreateHash = crypto.createHash;
+crypto.createHash = algorithm => cryptoOrigCreateHash(algorithm === 'md4' ? 'sha256' : algorithm);
 
 module.exports = {
   mode: 'development',

@@ -526,7 +526,7 @@ class LoadFile extends PureComponent {
         const { ipcRenderer } = window.require('electron');
         const filePaths = await ipcRenderer.invoke('open-file-dialog');
         if (filePaths.length > 0) {
-          this.readFile(filePaths[0])
+          this.readFile(filePaths[0]);
         }
       } else {
         this.fileInputEl.value = null;
@@ -541,42 +541,42 @@ class LoadFile extends PureComponent {
           log.error(error);
           return;
         }
-  
-          const file = new File([data], filePath, { type: "text/plain" });
-          const reader = new FileReader();
-          
-          reader.onload = (event) => {
-            const { result, error } = event.target;
 
-            if (error) {
-              log.error(error);
-              return;
-            }
-    
-            log.debug('FileReader:', pick(file, [
-              'lastModified',
-              'lastModifiedDate',
-              'meta',
-              'name',
-              'size',
-              'type'
-            ]));
-    
-            const meta = {
-              name: file.name,
-              size: file.size
-            };
-            this.actions.uploadFile(result, meta);
+        const file = new File([data], filePath, { type: 'text/plain' });
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+          const { result, error } = event.target;
+
+          if (error) {
+            log.error(error);
+            return;
+          }
+
+          log.debug('FileReader:', pick(file, [
+            'lastModified',
+            'lastModifiedDate',
+            'meta',
+            'name',
+            'size',
+            'type'
+          ]));
+
+          const meta = {
+            name: file.name,
+            size: file.size
           };
-  
-          reader.onerror = (event) => {
-            if (error) {
-              log.error(error);
-              return;
-            }
-          };
-  
-          reader.readAsText(file);
+          this.actions.uploadFile(result, meta);
+        };
+
+        reader.onerror = (event) => {
+          if (error) {
+            log.error(error);
+            return;
+          }
+        };
+
+        reader.readAsText(file);
       });
     }
 

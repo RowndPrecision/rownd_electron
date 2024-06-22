@@ -21,8 +21,8 @@ dotenv.config({
   path: path.resolve('webpack.config.app.production.env')
 });
 
-const crypto_orig_createHash = crypto.createHash;
-crypto.createHash = algorithm => crypto_orig_createHash(algorithm == "md4" ? "sha256" : algorithm);
+const cryptoOrigCreateHash = crypto.createHash;
+crypto.createHash = algorithm => cryptoOrigCreateHash(algorithm === 'md4' ? 'sha256' : algorithm);
 
 const USE_ESLINT_LOADER = boolean(process.env.USE_ESLINT_LOADER);
 const USE_TERSER_PLUGIN = boolean(process.env.USE_TERSER_PLUGIN);
