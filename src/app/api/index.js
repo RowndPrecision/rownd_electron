@@ -663,7 +663,6 @@ machines.run = (id) => new Promise((resolve, reject) => {
     });
 });
 
-
 export default {
   getLatestVersion,
 

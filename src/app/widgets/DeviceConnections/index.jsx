@@ -1,11 +1,11 @@
 import React, { PureComponent } from 'react';
 import _ from 'lodash';
+import isElectron from 'is-electron';
 // import PropTypes from 'prop-types';
 // import cx from 'classnames';
 import log from 'app/lib/log';
 import i18n from 'app/lib/i18n';
 import store from 'app//store';
-//import api from 'app/api';
 import espController from 'app/lib/controller';
 import { ToastNotification } from 'app/components/Notifications';
 import { GRBL,
@@ -20,6 +20,7 @@ import { GRBL,
 import io from 'socket.io-client';
 import styles from './index.styl';
 import ConnectedDevice from './ConnectedDevice';
+import GamepadConnection from './GamepadConnection';
 
 class DeviceConnections extends PureComponent {
     static propTypes = {
@@ -30,6 +31,10 @@ class DeviceConnections extends PureComponent {
     computerConnectionSocket = null;
 
     phoneBLEConnectionSocket = null;
+
+    gamepadBLEConnectionSocket = null;
+
+    gamepadConnection = new GamepadConnection();
 
     espControllerEvents = {
       'serialport:list': (ports) => {
@@ -129,10 +134,25 @@ class DeviceConnections extends PureComponent {
     componentDidMount() {
       this.addEspControllerEvents();
       this.espRefreshPorts();
+
+      this.gamepadConnection.start();
+
+      this.gamepadConnection.on('gamepad:connect', (gamepad) => {
+        this.setState(state => ({
+          gamepadConnected: true
+        }));
+      });
+      this.gamepadConnection.on('gamepad:disconnect', (gamepad) => {
+        this.setState(state => ({
+          gamepadConnected: false
+        }));
+      });
     }
 
     componentWillUnmount() {
       this.removeEspControllerEvents();
+
+      this.gamepadConnection.stop();
     }
 
     getInitialState() {
@@ -152,6 +172,7 @@ class DeviceConnections extends PureComponent {
         computerConnected: false,
         computerBaudrate: 115200,
         phoneBLEConnected: false,
+        gamepadConnected: false,
         alertMessage: ''
       };
     }
@@ -168,7 +189,7 @@ class DeviceConnections extends PureComponent {
       this.computerConnectionSocket = io.connect(host, options);
 
       this.computerConnectionSocket.on('connect', () => {
-        log.debug('Socket.IO sunucusuna bağlantı kuruldu.');
+        log.debug('Socket.IO Computer sunucusuna bağlantı kuruldu.');
 
         const espPort = this.state.ports[0];
         const computerPort = this.state.ports[1];
@@ -210,7 +231,7 @@ class DeviceConnections extends PureComponent {
       this.phoneBLEConnectionSocket = io.connect(host, options);
 
       this.phoneBLEConnectionSocket.on('connect', () => {
-        log.debug('Socket.IO sunucusuna bağlantı kuruldu.');
+        log.debug('Socket.IO Phone BLE sunucusuna bağlantı kuruldu.');
 
         const espPort = this.state.ports[0];
 
@@ -325,7 +346,7 @@ class DeviceConnections extends PureComponent {
     }
 
     render() {
-      const { espConnected, alertMessage, espController, computerConnected, phoneBLEConnected } = this.state;
+      const { espConnected, alertMessage, espController, computerConnected, phoneBLEConnected, gamepadConnected } = this.state;
       const activeState = _.get(espController.state, 'status.activeState');
 
       const grblStateText = {
@@ -372,10 +393,16 @@ class DeviceConnections extends PureComponent {
           <ConnectedDevice
             className={styles.connectedDevice}
             deviceName="Gamepad"
-            isConnected={false}
+            isConnected={gamepadConnected}
             infoText="*For connect to phone please use your gamepad"
             isManualConnectable={true}
-            onTapAction={() => {}}
+            onTapAction={async () => {
+              if (isElectron()) {
+                const { ipcRenderer } = window.require('electron');
+                const result = await ipcRenderer.invoke('run-python-script');
+                console.log(result);
+              }
+            }}
           />
           <ConnectedDevice
             className={styles.connectedDevice}
