@@ -1,5 +1,5 @@
 {
-  "name": "cncjs",
+  "name": "rownd-app",
   "version": "1.0.2",
   "description": "The Ultimate CNC Lathe Machine Unleashing Your Creative Journey",
   "homepage": "https://www.rowndcnc.com/",
@@ -16,7 +16,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:cncjs/cncjs.git"
+    "url": "git@github.com:RowndPrecision/rownd_electron.git"
   },
   "license": "MIT",
   "preferGlobal": true,
@@ -38,7 +38,7 @@
     "build:linux": "NODE_OPTIONS=--openssl-legacy-provider bash -c 'scripts/electron-builder.sh --linux --x64 --arm64 --armv7l'",
     "build:linux-x64": "bash -c 'scripts/electron-builder.sh --linux --x64'",
     "build:linux-armv7l": "bash -c 'scripts/electron-builder.sh --linux --armv7l'",
-    "build:linux-arm64": "cross-env DEBUG=electron-builder && bash -c 'scripts/electron-builder.sh --linux --arm64'",
+    "build:linux-arm64": "bash -c 'scripts/electron-builder.sh --linux --arm64'",
     "build:windows": "bash -c 'scripts/electron-builder.sh --windows --x64'",
     "build:windows-x64": "bash -c 'scripts/electron-builder.sh --windows --x64'",
     "start-electron": "electron ./dist/cncjs/main",
@@ -56,10 +56,10 @@
     "postinstall": ""
   },
   "build": {
-    "appId": "org.cncjs",
+    "appId": "com.rowndprecision.electron",
     "asar": false,
     "asarUnpack": [],
-    "productName": "CNCjs",
+    "productName": "Rownd",
     "directories": {
       "buildResources": "electron-build",
       "output": "output",
@@ -121,7 +121,8 @@
     "tinyg",
     "g2core",
     "react",
-    "socket.io"
+    "socket.io",
+    "rownd"
   ],
   "dependencies": {
     "@abandonware/bleno": "^0.6.1",
@@ -220,9 +221,9 @@
     "qs": "~6.7.0",
     "range_check": "~1.4.0",
     "rc-slider": "~8.6.9",
-    "react": "~15.6.2",
+    "react": "~16.8.0",
     "react-bootstrap": "~0.32.1",
-    "react-dom": "~15.6.2",
+    "react-dom": "~16.8.0",
     "react-dropzone": "~4.2.13",
     "react-facebook-loading": "~0.6.2",
     "react-final-form": "~3.7.0",
