@@ -60,7 +60,7 @@ jobs:
       shell: bash
       run: |
         GIT_COMMIT_LOG=`git log -1 --format='%ci %H %s'`
-        PRODUCT_NAME=Rownd Precision
+        PRODUCT_NAME="Rownd Precision"
         PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
         PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
         mkdir -p releases/linux
@@ -146,7 +146,7 @@ jobs:
       shell: bash
       run: |
         GIT_COMMIT_LOG=`git log -1 --format='%ci %H %s'`
-        PRODUCT_NAME=Rownd Precision
+        PRODUCT_NAME="Rownd Precision"
         PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
         PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
         mkdir -p releases/macos
@@ -230,7 +230,7 @@ jobs:
       shell: bash
       run: |
         GIT_COMMIT_LOG=`git log -1 --format='%ci %H %s'`
-        PRODUCT_NAME=Rownd Precision
+        PRODUCT_NAME="Rownd Precision"
         PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
         PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
         mkdir -p releases/windows
