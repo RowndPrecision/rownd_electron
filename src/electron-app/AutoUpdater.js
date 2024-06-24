@@ -37,7 +37,7 @@ class AutoUpdater {
       log.debug('update-not-available');
     });
 
-    const updateServerHost = ''; // FIXME
+    const updateServerHost = 'https://rownd-electron-update-server-rownd-precision.vercel.app';
     const platform = os.platform();
     const arch = os.arch();
     const version = app.getVersion();

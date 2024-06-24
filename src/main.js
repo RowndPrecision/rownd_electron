@@ -20,6 +20,7 @@ import {
 } from './electron-app/menu-template';
 import launchServer from './server-cli';
 import pkg from './package.json';
+import AutoUpdater from './electron-app/AutoUpdater';
 
 let mainWindow = null;
 let powerId = 0;
@@ -222,6 +223,8 @@ const showMainWindow = async () => {
       });
     });
   });
+
+  const autoUpdater = AutoUpdater(mainWindow);
 };
 
 // Increase V8 heap size of the main process in production
