@@ -225,6 +225,7 @@ const showMainWindow = async () => {
   });
 
   const autoUpdater = AutoUpdater(mainWindow);
+  console.log(autoUpdater);
 };
 
 // Increase V8 heap size of the main process in production
