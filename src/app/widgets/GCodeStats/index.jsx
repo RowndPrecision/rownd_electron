@@ -216,40 +216,6 @@ class GCodeStats extends PureComponent {
 
       return (
         <div className={styles['gcode-stats']}>
-          {/* <div className="row no-gutters" style={{ marginBottom: 10 }}>
-            <div className="col-xs-12">
-              <table className="table-bordered" data-table="dimension">
-                <thead>
-                  <tr>
-                    <th className={styles.axis}>{i18n._('Axis')}</th>
-                    <th>{i18n._('Min')}</th>
-                    <th>{i18n._('Max')}</th>
-                    <th>{i18n._('Dimension')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className={styles.axis}>X</td>
-                    <td>{state.bbox.min.x} {displayUnits}</td>
-                    <td>{state.bbox.max.x} {displayUnits}</td>
-                    <td>{state.bbox.delta.x} {displayUnits}</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.axis}>Y</td>
-                    <td>{state.bbox.min.y} {displayUnits}</td>
-                    <td>{state.bbox.max.y} {displayUnits}</td>
-                    <td>{state.bbox.delta.y} {displayUnits}</td>
-                  </tr>
-                  <tr>
-                    <td className={styles.axis}>Z</td>
-                    <td>{state.bbox.min.z} {displayUnits}</td>
-                    <td>{state.bbox.max.z} {displayUnits}</td>
-                    <td>{state.bbox.delta.z} {displayUnits}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div> */}
           <div className="row no-gutters" style={{ marginBottom: 10 }}>
             <div className="col-xs-6">
               <div>{i18n._('Sent')}</div>

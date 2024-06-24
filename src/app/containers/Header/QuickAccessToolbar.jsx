@@ -7,12 +7,24 @@ import portal from 'app/lib/portal';
 import Modal from 'app/components/Modal';
 import styles from './index.styl';
 import DeviceConsole from '../../widgets/DeviceConsole';
+import DraggablePopup from '../../widgets/components/DraggablePopup';
 
 class QuickAccessToolbar extends PureComponent {
     static propTypes = {
       state: PropTypes.object,
       actions: PropTypes.object
     };
+
+    constructor(props) {
+      super(props);
+      this.state = {
+        isPopupOpen: false
+      };
+    }
+
+  togglePopup = () => {
+    this.setState(prevState => ({ isPopupOpen: !prevState.isPopupOpen }));
+  };
 
     command = {
       'cyclestart': () => {
@@ -22,7 +34,7 @@ class QuickAccessToolbar extends PureComponent {
         controller.command('feedhold');
       },
       'console': () => {
-        this.openConsoleWidgetModal();
+        this.setState(prevState => ({ isPopupOpen: !prevState.isPopupOpen }));
       },
     };
 
@@ -46,6 +58,9 @@ class QuickAccessToolbar extends PureComponent {
     render() {
       return (
         <div className={styles.quickAccessToolbar}>
+          <DraggablePopup isOpen={this.state.isPopupOpen} onClose={this.togglePopup}>
+            <DeviceConsole />
+          </DraggablePopup>
           <ul className="nav navbar-nav">
             <li className="btn-group btn-group-sm" role="group">
               <button
