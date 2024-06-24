@@ -1,0 +1,20 @@
+{
+    "build": {
+      "env": {
+        "PKG_CONFIG_PATH": "/usr/lib64/pkgconfig"
+      },
+      "services": [
+        {
+          "name": "package_install",
+          "builder": "vercel-systems-builder@0.1.0",
+          "config": {
+            "commands": [
+              "apt-get update",
+              "apt-get install bluetooth bluez libbluetooth-dev libudev-dev libcrypt1"
+            ]
+          }
+        }
+      ]
+    }
+  }
+  
