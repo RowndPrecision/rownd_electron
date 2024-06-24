@@ -65,37 +65,23 @@ jobs:
         PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
         PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
         mkdir -p releases/linux
-        cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.x86_64.rpm" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.x86_64.rpm"
-        cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x86_64.AppImage"
-        cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_amd64.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-amd64.deb"
-        cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.armv7l.rpm" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.armv7l.rpm"
-        cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}-armv7l.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l.AppImage"
-        cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_armv7l.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l.deb"
-        cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.aarch64.rpm" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.aarch64.rpm"
-        cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}-arm64.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.AppImage"
         cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_arm64.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.deb"
         pushd releases/linux
-        ln -sf ../../output/linux-unpacked "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x64"
-        tar zcfh "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x64.tar.gz" "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x64"
-        rm -f "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x64"
-        ln -sf ../../output/linux-armv7l-unpacked "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l"
-        tar zcfh "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l.tar.gz" "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l"
-        rm -f "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l"
         ln -sf ../../output/linux-arm64-unpacked "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64"
         tar zcfh "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.tar.gz" "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64"
         rm -f "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64"
         popd
         ls -al output releases/linux
-        if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
+        if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "main" ]]; then
           yarn github-release delete \
-            --owner=cncjs \
-            --repo=cncjs \
+            --owner=RowndPrecision \
+            --repo=rownd_electron \
             --tag="${GITHUB_REF_NAME}-latest" \
             --release-name="${GITHUB_REF_NAME}" \
             "*-linux*";
           yarn github-release upload \
-            --owner=cncjs \
-            --repo=cncjs \
+            --owner=RowndPrecision \
+            --repo=rownd_electron \
             --tag="${GITHUB_REF_NAME}-latest" \
             --release-name="${GITHUB_REF_NAME}" \
             --body="${GIT_COMMIT_LOG}" \
@@ -169,16 +155,16 @@ jobs:
         cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.dmg" "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos-x64.dmg"
         cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}-arm64.dmg" "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos-arm64.dmg"
         ls -al output releases/macos
-        if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
+        if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "main" ]]; then
           yarn github-release delete \
-            --owner=cncjs \
-            --repo=cncjs \
+            --owner=RowndPrecision \
+            --repo=rownd_electron \
             --tag="${GITHUB_REF_NAME}-latest" \
             --release-name="${GITHUB_REF_NAME}" \
             "*-macos*";
           yarn github-release upload \
-            --owner=cncjs \
-            --repo=cncjs \
+            --owner=RowndPrecision \
+            --repo=rownd_electron \
             --tag="${GITHUB_REF_NAME}-latest" \
             --release-name="${GITHUB_REF_NAME}" \
             --body="${GIT_COMMIT_LOG}" \
@@ -253,16 +239,16 @@ jobs:
         mkdir -p releases/windows
         cp -af "output/${PRODUCT_NAME} Setup ${PACKAGE_VERSION}.exe" "releases/windows/${PACKAGE_NAME}-${PACKAGE_VERSION}-windows-x64.exe"
         ls -al output releases/windows
-        if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
+        if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "main" ]]; then
           yarn github-release delete \
-            --owner=cncjs \
-            --repo=cncjs \
+            --owner=RowndPrecision \
+            --repo=rownd_electron \
             --tag="${GITHUB_REF_NAME}-latest" \
             --release-name="${GITHUB_REF_NAME}" \
             "*-windows*";
           yarn github-release upload \
-            --owner=cncjs \
-            --repo=cncjs \
+            --owner=RowndPrecision \
+            --repo=rownd_electron \
             --tag="${GITHUB_REF_NAME}-latest" \
             --release-name="${GITHUB_REF_NAME}" \
             --body="${GIT_COMMIT_LOG}" \
