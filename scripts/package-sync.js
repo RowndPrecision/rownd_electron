@@ -25,7 +25,6 @@ const deps = _uniq([
   '@abandonware/bleno',
   '@abandonware/bluetooth-hci-socket',
   'serialport/bindings-cpp',
-  'usb',
   'core-js', // to polyfill ECMAScript features
   'regenerator-runtime', // needed to use transpiled generator functions
   'debug', // 'debug' is required for electron app
