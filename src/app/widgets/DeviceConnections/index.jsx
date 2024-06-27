@@ -47,14 +47,14 @@ class DeviceConnections extends PureComponent {
         }));
 
         ports.forEach((port) => {
-          const { espPortManufacturer, espBaudrate } = this.state;
+          const { espPortManufacturer, espBaudrate, computerPortManufacturer } = this.state;
           if (port.manufacturer === espPortManufacturer) {
             this.setState(state => ({
               alertMessage: '',
-              espPort: ports[0],
+              espPort: port,
             }));
 
-            this.espOpenPort(ports[0], {
+            this.espOpenPort(port, {
               baudrate: espBaudrate
             });
 
@@ -63,6 +63,12 @@ class DeviceConnections extends PureComponent {
             this.setState(state => ({
               alertMessage: 'Rownd port not found', // TODO: Localization
               espPort: null
+            }));
+          }
+
+          if (port.manufacturer === computerPortManufacturer) {
+            this.setState(state => ({
+              computerPort: port,
             }));
           }
         });
@@ -170,6 +176,8 @@ class DeviceConnections extends PureComponent {
         espBaudrate: 115200,
         computerConnecting: false,
         computerConnected: false,
+        computerPort: {},
+        computerPortManufacturer: 'FTDI',
         computerBaudrate: 115200,
         phoneBLEConnected: false,
         gamepadConnected: false,
@@ -191,8 +199,8 @@ class DeviceConnections extends PureComponent {
       this.computerConnectionSocket.on('connect', () => {
         log.debug('Socket.IO Computer sunucusuna bağlantı kuruldu.');
 
-        const espPort = this.state.ports[0];
-        const computerPort = this.state.ports[1];
+        const espPort = this.state.espPort;
+        const computerPort = this.state.computerPort;
         const baudrate = this.state.computerBaudrate;
 
         this.computerConnectionSocket.emit('open', espPort, computerPort, baudrate, (connection) => {
