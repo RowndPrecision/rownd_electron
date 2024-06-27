@@ -18,7 +18,7 @@ on:
 jobs:
   build-linux:
     name: Build Linux packages
-    runs-on: ubuntu-latest
+    runs-on: rasberian-arm64
     strategy:
       matrix:
         node-version: [20.x]
@@ -50,14 +50,15 @@ jobs:
         yarn up
         yarn install
         yarn lint
+        yarn electron-rebuild
     - name: Run "build" script
-      if: github.ref_type == 'tag'
       run: yarn run build
     - name: Run "build-latest" script
       if: github.ref_type == 'branch'
       run: yarn run build-latest
     - name: Build Linux binaries
       run: |
+        export USE_SYSTEM_FPM="true"
         yarn run build:linux-arm64
     - name: Prepare release assets
       shell: bash
