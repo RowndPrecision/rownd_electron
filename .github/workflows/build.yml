@@ -51,8 +51,6 @@ jobs:
         yarn install
         yarn lint
         yarn electron-rebuild
-    - name: Use system FPM
-      run: export USE_SYSTEM_FPM='true'
     - name: Run "build" script
       run: yarn run build
     - name: Run "build-latest" script
@@ -60,6 +58,7 @@ jobs:
       run: yarn run build-latest
     - name: Build Linux binaries
       run: |
+        export USE_SYSTEM_FPM="true"
         yarn run build:linux-arm64
     - name: Prepare release assets
       shell: bash
