@@ -14,9 +14,9 @@ const notify = (title, message) => {
 
 class AutoUpdater {
   constructor(window) {
-    if (process.platform !== 'darwin') {
-      return;
-    }
+    // if (process.platform !== 'darwin') {
+    //   return;
+    // }
 
     autoUpdater.addListener('update-available', (event) => {
       log.debug('A new update is available');
@@ -28,20 +28,21 @@ class AutoUpdater {
       notify(title, message);
     });
     autoUpdater.addListener('error', (err) => {
-      log.error(err);
+      console.log(err, 'auto updater error');
     });
     autoUpdater.addListener('checking-for-update', () => {
-      log.debug('checking-for-update');
+      console.log('checking-for-update');
     });
     autoUpdater.addListener('update-not-available', () => {
-      log.debug('update-not-available');
+      console.log('update-not-available');
     });
 
-    const updateServerHost = 'https://rownd-electron-update-server-rownd-precision.vercel.app';
+    const updateServerHost = 'rownd-electron-update-server-rownd-precision.vercel.app';
     const platform = os.platform();
     const arch = os.arch();
-    const version = app.getVersion();
+    const version = '1.0.7';
     const feedURL = `https://${updateServerHost}/update/${platform}-${arch}/${version}`;
+    console.log(feedURL, 'feed url');
     autoUpdater.setFeedURL(feedURL);
 
     window.webContents.once('did-frame-finish-load', (event) => {
