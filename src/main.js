@@ -224,7 +224,7 @@ const showMainWindow = async () => {
     });
   });
 
-  const autoUpdater = AutoUpdater(mainWindow);
+  const autoUpdater = new AutoUpdater(mainWindow);
   console.log(autoUpdater);
 };
 
