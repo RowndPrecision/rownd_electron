@@ -52,6 +52,7 @@ jobs:
         yarn lint
         yarn electron-rebuild
     - name: Run "build" script
+      if: github.ref_type == 'tag'
       run: yarn run build
     - name: Run "build-latest" script
       if: github.ref_type == 'branch'
