@@ -58,7 +58,7 @@ jobs:
       run: yarn run build-latest
     - name: Build Linux binaries
       run: |
-        yarn run build:linux
+        yarn run build:linux-arm64
     - name: Prepare release assets
       shell: bash
       run: |
