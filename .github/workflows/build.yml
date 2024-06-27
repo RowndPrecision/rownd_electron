@@ -4,12 +4,9 @@ permissions:
   contents: write
 
 on:
-  # https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#example-including-branches-and-tags
   push:
-    # Sequence of patterns matched against refs/heads
     branches:
       - main
-    # Sequence of patterns matched against refs/tags
     tags:
       - '*'
   pull_request:
@@ -27,17 +24,43 @@ jobs:
     steps:
     - name: Install dependencies
       run: sudo apt-get install bluetooth bluez libbluetooth-dev libudev-dev
+      
     - name: Checkout code
       uses: actions/checkout@v3
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+      with:
+        platforms: arm64
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Cache Docker layers
+      uses: actions/cache@v2
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+
+    - name: Build Docker image
+      run: |
+        docker buildx build --platform linux/arm64 -t my-image:arm64 .
+
+    - name: Run Docker container
+      run: |
+        docker run --rm my-image:arm64
+
     - name: Setup Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
+
     - name: Environment variables
       run: |
-        # https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
         echo "• GITHUB_REF_NAME=$GITHUB_REF_NAME"
-        echo "• GITHUB_REF_TYPE=$GITHUB_REF_TYPE" # `branch` or `tag`
+        echo "• GITHUB_REF_TYPE=$GITHUB_REF_TYPE"
         echo "• GITHUB_RUN_NUMBER=$GITHUB_RUN_NUMBER"
         echo "• GITHUB_SHA=$GITHUB_SHA"
         echo "• RUNNER_ARCH=$RUNNER_ARCH"
@@ -45,22 +68,28 @@ jobs:
         echo "• RUNNER_OS=$RUNNER_OS"
         echo "• RUNNER_TEMP=$RUNNER_TEMP"
         echo "• RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
+
     - name: Install Yarn package manager
       run: npm install -g yarn
+
     - name: Install necessary dependencies and perform initial checks
       run: |
         yarn up
         yarn install
         yarn lint
+        yarn electron-rebuild
+
     - name: Run "build" script
-      if: github.ref_type == 'tag'
       run: yarn run build
+
     - name: Run "build-latest" script
       if: github.ref_type == 'branch'
       run: yarn run build-latest
+
     - name: Build Linux binaries
       run: |
         yarn run build:linux-arm64
+
     - name: Prepare release assets
       shell: bash
       run: |
@@ -91,16 +120,12 @@ jobs:
             --body="${GIT_COMMIT_LOG}" \
             releases/linux/*;
         fi
-    #- name: Upload release assets
-    #  uses: actions/github-script@v6
-    #  with:
-    #    github-token: ${{ secrets.GITHUB_TOKEN }}
-    #    script: |
-    #      // https://github.com/actions/upload-release-asset/issues/47#issuecomment-659071145
-    #      console.log('environment:', process.versions);
+
     - name: Release
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
         files: |
           releases/linux/*
+
+
