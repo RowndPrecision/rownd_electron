@@ -8,11 +8,12 @@ import {
   ipcMain,
   powerSaveBlocker,
   screen,
-  shell,
+  shell
 } from 'electron';
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
+import { autoUpdater } from 'electron-updater';
 import {
   createApplicationMenuTemplate,
   inputMenuTemplate,
@@ -20,7 +21,14 @@ import {
 } from './electron-app/menu-template';
 import launchServer from './server-cli';
 import pkg from './package.json';
-import AutoUpdater from './electron-app/AutoUpdater';
+
+const log = require('electron-log');
+
+log.transports.file.level = 'info';
+log.transports.console.level = 'info';
+
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
 
 let mainWindow = null;
 let powerId = 0;
@@ -107,6 +115,34 @@ function getBrowserWindowOptions() {
 
   return Object.assign({}, defaultOptions, windowOptions);
 }
+
+app.on('ready', () => {
+  autoUpdater.checkForUpdatesAndNotify();
+});
+
+autoUpdater.on('update-available', (info) => {
+  log.info('Update available:', info);
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  log.info('Update downloaded:', info);
+  const dialogOpts = {
+    type: 'info',
+    buttons: ['Restart', 'Later'],
+    title: 'Application Update',
+    message: 'A new version has been downloaded. Restart the application to apply the updates.'
+  };
+
+  dialog.showMessageBox(dialogOpts).then((returnValue) => {
+    if (returnValue.response === 0) {
+      autoUpdater.quitAndInstall();
+    }
+  });
+});
+
+autoUpdater.on('error', (err) => {
+  log.error('Error in auto-updater:', err);
+});
 
 const showMainWindow = async () => {
   const browserWindowOptions = getBrowserWindowOptions();
@@ -223,9 +259,6 @@ const showMainWindow = async () => {
       });
     });
   });
-
-  const autoUpdater = new AutoUpdater(mainWindow);
-  console.log(autoUpdater);
 };
 
 // Increase V8 heap size of the main process in production

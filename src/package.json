@@ -1,14 +1,16 @@
 {
   "name": "rownd-app",
-  "version": "1.0.7",
+  "version": "1.0.0",
   "productName": "Rownd",
   "description": "The Ultimate CNC Lathe Machine Unleashing Your Creative Journey",
   "homepage": "https://www.rowndcnc.com/",
   "author": "Yakup Ad <yakup@rowndprecision.com>",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:RowndPrecision/rownd_electron.git"
+  "repository": "https://github.com/RowndPrecision/rownd_electron",
+  "publish": {
+    "provider": "github",
+    "owner": "RowndPrecision",
+    "repo": "rownd_electron"
   },
   "main": "main.js",
   "permissions": [
@@ -31,7 +33,9 @@
     "core-js": "~3.26.1",
     "debug": "~4.1.1",
     "deep-keys": "~0.5.0",
+    "electron-log": "^5.1.5",
     "electron-store": "~8.1.0",
+    "electron-updater": "^6.2.1",
     "ensure-array": "~1.0.0",
     "ensure-type": "~1.5.1",
     "errorhandler": "~1.5.0",
