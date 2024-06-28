@@ -10,6 +10,7 @@ import {
   screen,
   shell
 } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
@@ -21,12 +22,19 @@ import {
 import launchServer from './server-cli';
 import pkg from './package.json';
 import AutoUpdater from './electron-app/AutoUpdater';
+import log from './electron-app/log';
 
 let mainWindow = null;
 let powerId = 0;
 const store = new Store();
 
-const { spawn } = require('child_process');
+// const { spawn } = require('child_process');
+
+log.transports.file.level = 'info';
+log.transports.console.level = 'info';
+
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
 
 // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
 const gotSingleInstanceLock = app.requestSingleInstanceLock();
@@ -107,11 +115,6 @@ function getBrowserWindowOptions() {
 
   return Object.assign({}, defaultOptions, windowOptions);
 }
-
-app.on('ready', () => {
-  // eslint-disable-next-line no-unused-vars
-  const autoUpdater = new AutoUpdater(mainWindow);
-});
 
 const showMainWindow = async () => {
   const browserWindowOptions = getBrowserWindowOptions();
@@ -205,30 +208,68 @@ const showMainWindow = async () => {
     return result.filePaths;
   });
 
-  ipcMain.handle('run-python-script', (event) => {
-    return new Promise((resolve, reject) => {
-      const script = spawn('python3', [path.join(__dirname, 'bluetooth_gamepad_connect.py')]);
+  // ipcMain.handle('run-python-script', (event) => {
+  //   return new Promise((resolve, reject) => {
+  //     const script = spawn('python3', [path.join(__dirname, 'bluetooth_gamepad_connect.py')]);
 
-      let scriptOutput = '';
+  //     let scriptOutput = '';
 
-      script.stdout.on('data', (data) => {
-        scriptOutput += data.toString();
-      });
+  //     script.stdout.on('data', (data) => {
+  //       scriptOutput += data.toString();
+  //     });
 
-      script.stderr.on('data', (data) => {
-        console.error(`stderr: ${data}`);
-      });
+  //     script.stderr.on('data', (data) => {
+  //       console.error(`stderr: ${data}`);
+  //     });
 
-      script.on('close', (code) => {
-        if (code === 0) {
-          resolve(scriptOutput);
-        } else {
-          reject(new Error('Script exited with non-zero code'));
-        }
-      });
-    });
-  });
+  //     script.on('close', (code) => {
+  //       if (code === 0) {
+  //         resolve(scriptOutput);
+  //       } else {
+  //         reject(new Error('Script exited with non-zero code'));
+  //       }
+  //     });
+  //   });
+  // });
+
+  autoUpdater.checkForUpdatesAndNotify();
 };
+
+// Auto Update
+autoUpdater.on('update-available', (info) => {
+  log.info('Update available:', info);
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  log.info('Update downloaded:', info);
+  const dialogOpts = {
+    type: 'info',
+    buttons: ['Restart', 'Later'],
+    title: 'Application Update',
+    message: 'A new version has been downloaded. Restart the application to apply the updates.'
+  };
+
+  dialog.showMessageBox(dialogOpts).then((returnValue) => {
+    if (returnValue.response === 0) {
+      autoUpdater.quitAndInstall();
+    }
+  });
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+  let message = 'Download speed: ' + progressObj.bytesPerSecond;
+  message = message + ' - Downloaded ' + progressObj.percent + '%';
+  message = message + ' (' + progressObj.transferred + '/' + progressObj.total + ')';
+  console.log(message);
+});
+
+autoUpdater.on('error', (err) => {
+  console.log('Error in auto-updater:', err);
+});
+
+setInterval(() => {
+  autoUpdater.checkForUpdatesAndNotify();
+}, 600000);
 
 // Increase V8 heap size of the main process in production
 if (process.arch === 'x64') {
