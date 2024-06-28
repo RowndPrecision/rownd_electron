@@ -13,7 +13,6 @@ import {
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
-import { autoUpdater } from 'electron-updater';
 import {
   createApplicationMenuTemplate,
   inputMenuTemplate,
@@ -21,14 +20,7 @@ import {
 } from './electron-app/menu-template';
 import launchServer from './server-cli';
 import pkg from './package.json';
-
-const log = require('electron-log');
-
-log.transports.file.level = 'info';
-log.transports.console.level = 'info';
-
-autoUpdater.logger = log;
-autoUpdater.logger.transports.file.level = 'info';
+import AutoUpdater from './electron-app/AutoUpdater';
 
 let mainWindow = null;
 let powerId = 0;
@@ -117,31 +109,8 @@ function getBrowserWindowOptions() {
 }
 
 app.on('ready', () => {
-  autoUpdater.checkForUpdatesAndNotify();
-});
-
-autoUpdater.on('update-available', (info) => {
-  log.info('Update available:', info);
-});
-
-autoUpdater.on('update-downloaded', (info) => {
-  log.info('Update downloaded:', info);
-  const dialogOpts = {
-    type: 'info',
-    buttons: ['Restart', 'Later'],
-    title: 'Application Update',
-    message: 'A new version has been downloaded. Restart the application to apply the updates.'
-  };
-
-  dialog.showMessageBox(dialogOpts).then((returnValue) => {
-    if (returnValue.response === 0) {
-      autoUpdater.quitAndInstall();
-    }
-  });
-});
-
-autoUpdater.on('error', (err) => {
-  log.error('Error in auto-updater:', err);
+  // eslint-disable-next-line no-unused-vars
+  const autoUpdater = new AutoUpdater(mainWindow);
 });
 
 const showMainWindow = async () => {
