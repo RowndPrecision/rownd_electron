@@ -14,6 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
+import log from 'electron-log';
 import {
   createApplicationMenuTemplate,
   inputMenuTemplate,
@@ -21,7 +22,6 @@ import {
 } from './electron-app/menu-template';
 import launchServer from './server-cli';
 import pkg from './package.json';
-import log from './electron-app/log';
 
 let mainWindow = null;
 let powerId = 0;
