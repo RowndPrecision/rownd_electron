@@ -110,7 +110,8 @@
             "arm64"
           ]
         }
-      ]
+      ],
+      "artifactName": "${name}-${version}-linux-${arch}.${ext}"
     },
     "deb": {
       "afterInstall": "scripts/after-install.sh"
