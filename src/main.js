@@ -15,6 +15,8 @@ import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
 import log from 'electron-log';
+import AutoLaunch from 'auto-launch';
+import { exec } from 'child_process';
 import {
   createApplicationMenuTemplate,
   inputMenuTemplate,
@@ -28,12 +30,6 @@ let powerId = 0;
 const store = new Store();
 
 // const { spawn } = require('child_process');
-
-log.transports.file.level = 'info';
-log.transports.console.level = 'info';
-
-autoUpdater.logger = log;
-autoUpdater.logger.transports.file.level = 'info';
 
 // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
 const gotSingleInstanceLock = app.requestSingleInstanceLock();
@@ -207,34 +203,27 @@ const showMainWindow = async () => {
     return result.filePaths;
   });
 
-  // ipcMain.handle('run-python-script', (event) => {
-  //   return new Promise((resolve, reject) => {
-  //     const script = spawn('python3', [path.join(__dirname, 'bluetooth_gamepad_connect.py')]);
-
-  //     let scriptOutput = '';
-
-  //     script.stdout.on('data', (data) => {
-  //       scriptOutput += data.toString();
-  //     });
-
-  //     script.stderr.on('data', (data) => {
-  //       console.error(`stderr: ${data}`);
-  //     });
-
-  //     script.on('close', (code) => {
-  //       if (code === 0) {
-  //         resolve(scriptOutput);
-  //       } else {
-  //         reject(new Error('Script exited with non-zero code'));
-  //       }
-  //     });
-  //   });
-  // });
+  ipcMain.handle('run-python-script', (event) => {
+    const command = 'blueman-manager';
+    exec(command, (err, stdout, stderr) => {
+      if (err) {
+        console.error('An error occurred', err);
+        return;
+      }
+      console.log(stdout);
+    });
+  });
 
   autoUpdater.checkForUpdatesAndNotify();
 };
 
 // Auto Update
+log.transports.file.level = 'info';
+log.transports.console.level = 'info';
+
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
+
 autoUpdater.on('update-available', (info) => {
   log.info('Update available:', info);
 });
@@ -356,3 +345,20 @@ app.on('second-instance', (event, argv, workingDirectory, additionalData) => {
  * Returns Promise<void> - fulfilled when Electron is initialized. May be used as a convenient alternative to checking `app.isReady()` and subscribing to the `ready` event if the app is not ready yet.
  */
 app.whenReady().then(showMainWindow);
+
+
+// Auto Launch
+const autoLauncher = new AutoLaunch({
+  name: 'Rownd',
+  path: '/opt/Rownd/rownd-app'
+});
+
+autoLauncher.isEnabled()
+  .then((isEnabled) => {
+    if (!isEnabled) {
+      autoLauncher.enable();
+    }
+  })
+  .catch((err) => {
+    console.error('App Launcher Error:', err);
+  });

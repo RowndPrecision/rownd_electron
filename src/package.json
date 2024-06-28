@@ -1,6 +1,6 @@
 {
   "name": "rownd-app",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "productName": "Rownd",
   "description": "The Ultimate CNC Lathe Machine Unleashing Your Creative Journey",
   "homepage": "https://www.rowndcnc.com/",
@@ -21,6 +21,7 @@
   "dependencies": {
     "@abandonware/bleno": "^0.6.1",
     "@serialport/parser-readline": "^10.0.0",
+    "auto-launch": "^5.0.6",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.18.3",
     "chalk": "~2.4.2",

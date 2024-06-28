@@ -1,6 +1,6 @@
 {
   "name": "rownd-app",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "The Ultimate CNC Lathe Machine Unleashing Your Creative Journey",
   "homepage": "https://www.rowndcnc.com/",
   "author": "Yakup Ad <yakup@rowndprecision.com>",
@@ -160,6 +160,7 @@
     "@trendmicro/react-toggle-switch": "~0.5.7",
     "@trendmicro/react-tooltip": "~0.6.0",
     "@trendmicro/react-validation": "~0.1.0",
+    "auto-launch": "^5.0.6",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.18.3",
     "bootstrap": "~3.3.7",

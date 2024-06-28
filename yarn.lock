@@ -3678,6 +3678,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"applescript@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "applescript@npm:1.0.0"
+  checksum: 77469e6a71425131329c1bd0844a6d3cc6224131c74651e771209926b3d35d7e4a4426a8d3b7bab0c1d4bb0c2fe4e9439adbdbf1fc3af691e0386d85341a89bf
+  languageName: node
+  linkType: hard
+
 "aproba@npm:^1.0.3 || ^2.0.0, aproba@npm:^1.1.1":
   version: 1.2.0
   resolution: "aproba@npm:1.2.0"
@@ -4085,6 +4092,19 @@ __metadata:
   dependencies:
     core-js: ^2.5.0
   checksum: 836c0e863719c0355e8ad4214e4c81f24dd9e724233153200189732da691f73e6f13316b8ac456d75749a89780f0da67e44387e46dfc3fd9a517a84a0e45acbc
+  languageName: node
+  linkType: hard
+
+"auto-launch@npm:^5.0.6":
+  version: 5.0.6
+  resolution: "auto-launch@npm:5.0.6"
+  dependencies:
+    applescript: ^1.0.0
+    mkdirp: ^0.5.1
+    path-is-absolute: ^1.0.0
+    untildify: ^3.0.2
+    winreg: 1.2.4
+  checksum: 4da4b6033b5556091f57f4a271cd6484c5f46f48da2949644f4f5462b07b6f3739d77b9ffcdd96c8c2b1f3c51ae17743ad555ff2bddfb684760c74a621f11896
   languageName: node
   linkType: hard
 
@@ -17167,6 +17187,7 @@ __metadata:
     "@trendmicro/react-toggle-switch": ~0.5.7
     "@trendmicro/react-tooltip": ~0.6.0
     "@trendmicro/react-validation": ~0.1.0
+    auto-launch: ^5.0.6
     babel-core: ~7.0.0-bridge.0
     babel-eslint: ~10.0.1
     babel-loader: ~8.0.5
@@ -20015,6 +20036,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"untildify@npm:^3.0.2":
+  version: 3.0.3
+  resolution: "untildify@npm:3.0.3"
+  checksum: 1c42352a37d9663090f126f343f1ee0a0b90c0a4bd7991229a6f474fa0ab856880f0e8798c15fa12c13e64c5345f63dd428e4b6ac2073d594839548025a4bed9
+  languageName: node
+  linkType: hard
+
 "upath@npm:^1.1.1":
   version: 1.2.0
   resolution: "upath@npm:1.2.0"
@@ -20763,6 +20791,13 @@ __metadata:
   bin:
     window-size: cli.js
   checksum: a85e2acf156cfa194301294809867bdadd8a48ee5d972d9fa8e3e1b3420a1d0201b13ac8eb0348a0d14bbf2c3316565b6a749749c2384c5d286caf8a064c4f90
+  languageName: node
+  linkType: hard
+
+"winreg@npm:1.2.4":
+  version: 1.2.4
+  resolution: "winreg@npm:1.2.4"
+  checksum: 6b28ed0c289bdbae87bd05c69fe676765fa51ca28a904cceb89a30ee1ddd61ae1432d0d4f51621a86c4fbdefa8ad380e9eaa90cbdc722ccae11396231475e3cf
   languageName: node
   linkType: hard
 
