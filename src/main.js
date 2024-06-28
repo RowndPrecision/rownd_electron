@@ -21,7 +21,6 @@ import {
 } from './electron-app/menu-template';
 import launchServer from './server-cli';
 import pkg from './package.json';
-import AutoUpdater from './electron-app/AutoUpdater';
 import log from './electron-app/log';
 
 let mainWindow = null;
