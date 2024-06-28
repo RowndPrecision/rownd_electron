@@ -69,11 +69,11 @@ jobs:
         PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
         PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
         mkdir -p releases/linux
-        cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_arm64.deb" "releases/linux/${PACKAGE_NAME}_${PACKAGE_VERSION}_arm64.deb"
+        cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_arm64.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.deb"
         pushd releases/linux
-        ln -sf ../../output/linux-arm64-unpacked "${PACKAGE_NAME}_${PACKAGE_VERSION}_arm64"
-        tar zcfh "${PACKAGE_NAME}_${PACKAGE_VERSION}_arm64.tar.gz" "${PACKAGE_NAME}_${PACKAGE_VERSION}_arm64"
-        rm -f "${PACKAGE_NAME}_${PACKAGE_VERSION}_arm64"
+        ln -sf ../../output/linux-arm64-unpacked "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64"
+        tar zcfh "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.tar.gz" "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64"
+        rm -f "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64"
         popd
         ls -al output releases/linux
         if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "main" ]]; then
