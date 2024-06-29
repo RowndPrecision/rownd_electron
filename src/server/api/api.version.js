@@ -1,49 +1,34 @@
-import url from 'url';
-import registryUrl from 'registry-url';
-import registryAuthToken from 'registry-auth-token';
 import request from 'superagent';
 import {
   ERR_INTERNAL_SERVER_ERROR
 } from '../constants';
+import pkg from '../../package.json';
 
 const pkgName = 'cncjs';
 
 export const getLatestVersion = (req, res) => {
-  const scope = pkgName.split('/')[0];
-  const regUrl = registryUrl(scope);
-  const pkgUrl = url.resolve(regUrl, encodeURIComponent(pkgName).replace(/^%40/, '@'));
-  const authInfo = registryAuthToken(regUrl);
-  const headers = {};
+  const url = 'https://rownd-electron-update-server.vercel.app/update/deb_arm64/' + pkg.version;
 
-  if (authInfo) {
-    headers.Authorization = `${authInfo.type} ${authInfo.token}`;
-  }
-
+  console.log(pkg.version)
   request
-    .get(pkgUrl)
-    .set(headers)
-    .end((err, _res) => {
+    .get(url)
+    .then((_res) => {
+      const { body: data = {} } = { ..._res };
+      console.log(data);
+      res.send({ 
+        time: data['pub_date'], 
+        name: "Rownd", 
+        version: data['name'] ?? pkg.version, 
+        description: data['notes'], 
+        homepage: "https://rownd-electron-update-server.vercel.app" 
+      });
+    })
+    .catch((err) => {
       if (err) {
         res.status(ERR_INTERNAL_SERVER_ERROR).send({
-          msg: `Failed to connect to ${pkgUrl}: code=${err.code}`
+          msg: `Failed to connect to ${url}: code=${err.code}`
         });
         return;
       }
-
-      const { body: data = {} } = { ..._res };
-      data.time = data.time || {};
-      data['dist-tags'] = data['dist-tags'] || {};
-      data.versions = data.versions || {};
-
-      const time = data.time[latest];
-      const latest = data['dist-tags'].latest;
-      const {
-        name,
-        version,
-        description,
-        homepage
-      } = { ...data.versions[latest] };
-
-      res.send({ time, name, version, description, homepage });
-    });
+    });;
 };

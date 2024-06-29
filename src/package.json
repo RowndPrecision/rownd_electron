@@ -1,6 +1,6 @@
 {
   "name": "rownd-app",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "productName": "Rownd",
   "description": "The Ultimate CNC Lathe Machine Unleashing Your Creative Journey",
   "homepage": "https://www.rowndcnc.com/",
@@ -61,8 +61,6 @@
     "morgan": "~1.9.1",
     "range_check": "~1.4.0",
     "regenerator-runtime": "~0.13.10",
-    "registry-auth-token": "~3.4.0",
-    "registry-url": "~5.1.0",
     "rimraf": "~2.6.3",
     "serialport": "^10.0.0",
     "serve-favicon": "~2.5.0",

@@ -9,21 +9,11 @@ const HelpContainer = () => {
         type="button"
         className="btn btn-default"
         onClick={() => {
-          const url = 'https://github.com/cncjs/cncjs/releases';
+          const url = 'https://rownd-electron-update-server.vercel.app';
           window.open(url, '_blank');
         }}
       >
         {i18n._('Downloads')}
-      </button>
-      <button
-        type="button"
-        className="btn btn-default"
-        onClick={() => {
-          const url = 'https://github.com/cncjs/cncjs/issues';
-          window.open(url, '_blank');
-        }}
-      >
-        {i18n._('Report an issue')}
       </button>
     </div>
   );

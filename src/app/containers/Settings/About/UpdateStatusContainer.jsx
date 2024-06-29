@@ -46,7 +46,7 @@ const UpdateStatusContainer = (props) => {
         </div>
         <div className={styles.updateStatusActionContainer}>
           <Anchor
-            href="https://github.com/cncjs/cncjs/releases"
+            href="https://rownd-electron-update-server.vercel.app"
             target="_blank"
           >
             <span className={styles.label}>

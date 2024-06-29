@@ -6,7 +6,7 @@ import i18n from 'app/lib/i18n';
 import styles from './index.styl';
 
 const AboutContainer = ({ version }) => {
-  const wiki = 'https://github.com/cncjs/cncjs/wiki';
+  const wiki = 'https://www.rowndcnc.com';
 
   return (
     <div className={styles.aboutContainer}>
@@ -16,7 +16,7 @@ const AboutContainer = ({ version }) => {
           {`${settings.productName} ${version.current}`}
         </div>
         <div className={styles.aboutProductDescription}>
-          {i18n._('A web-based interface for CNC milling controller running Grbl, Smoothieware, or TinyG')}
+          {i18n._('The Ultimate CNC Lathe Machine Unleashing Your Creative Journey')}
         </div>
         <Anchor
           className={styles.learnmore}
