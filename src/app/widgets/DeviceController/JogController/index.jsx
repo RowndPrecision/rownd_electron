@@ -78,7 +78,7 @@ class JogController extends PureComponent {
         workflow: {
           state: espController.workflow.state
         },
-        axes: ['x', 'y', 'z'],
+        axes: ['x', 'c', 'z'],
         jog: {
           axis: '', // Defaults to empty
           metric: {
@@ -254,7 +254,7 @@ class JogController extends PureComponent {
       const canClickX = state.canClick && includes(axes, 'x');
       const canClickZ = state.canClick && includes(axes, 'z');
       const canClickXZ = canClickX && canClickZ;
-      const canClickY = state.canClick && includes(axes, 'y');
+      const canClickC = state.canClick && includes(axes, 'c');
 
       return (
         <div className={styles.jogControllerContainer}>
@@ -266,11 +266,11 @@ class JogController extends PureComponent {
                 repeatInterval={Math.floor(1000 / 15)}
                 onHold={() => {
                   const distance = this.getJogDistance();
-                  this.jog({ X: -distance, Z: distance });
+                  this.jog({ X: distance, Z: -distance });
                 }}
                 onRelease={() => {
                   const distance = this.getJogDistance();
-                  this.jog({ X: -distance, Z: distance });
+                  this.jog({ X: distance, Z: -distance });
                 }}
               >
                 <button
@@ -289,11 +289,11 @@ class JogController extends PureComponent {
                 repeatInterval={Math.floor(1000 / 15)}
                 onHold={() => {
                   const distance = this.getJogDistance();
-                  this.jog({ Z: distance });
+                  this.jog({ X: distance });
                 }}
                 onRelease={() => {
                   const distance = this.getJogDistance();
-                  this.jog({ Z: distance });
+                  this.jog({ X: distance });
                 }}
               >
                 <button
@@ -302,7 +302,7 @@ class JogController extends PureComponent {
                   className={cx(styles.jogButton, styles.mainAxe)}
                   disabled={!canClickZ}
                 >
-            Z+
+            X+
                 </button>
               </Repeatable>
 
@@ -335,11 +335,11 @@ class JogController extends PureComponent {
                 repeatInterval={Math.floor(1000 / 15)}
                 onHold={() => {
                   const distance = this.getJogDistance();
-                  this.jog({ X: -distance });
+                  this.jog({ Z: -distance });
                 }}
                 onRelease={() => {
                   const distance = this.getJogDistance();
-                  this.jog({ X: -distance });
+                  this.jog({ Z: -distance });
                 }}
               >
                 <button
@@ -348,7 +348,7 @@ class JogController extends PureComponent {
                   className={cx(styles.jogButton, styles.mainAxe)}
                   disabled={!canClickX}
                 >
-            X-
+            Z-
                 </button>
               </Repeatable>
 
@@ -375,11 +375,11 @@ class JogController extends PureComponent {
                 repeatInterval={Math.floor(1000 / 15)}
                 onHold={() => {
                   const distance = this.getJogDistance();
-                  this.jog({ X: distance });
+                  this.jog({ Z: distance });
                 }}
                 onRelease={() => {
                   const distance = this.getJogDistance();
-                  this.jog({ X: distance });
+                  this.jog({ Z: distance });
                 }}
               >
                 <button
@@ -388,7 +388,7 @@ class JogController extends PureComponent {
                   className={cx(styles.jogButton, styles.mainAxe)}
                   disabled={!canClickX}
                 >
-            X+
+            Z+
                 </button>
               </Repeatable>
 
@@ -421,11 +421,11 @@ class JogController extends PureComponent {
                 repeatInterval={Math.floor(1000 / 15)}
                 onHold={() => {
                   const distance = this.getJogDistance();
-                  this.jog({ Z: -distance });
+                  this.jog({ X: -distance });
                 }}
                 onRelease={() => {
                   const distance = this.getJogDistance();
-                  this.jog({ Z: -distance });
+                  this.jog({ X: -distance });
                 }}
               >
                 <button
@@ -434,7 +434,7 @@ class JogController extends PureComponent {
                   className={cx(styles.jogButton, styles.mainAxe)}
                   disabled={!canClickZ}
                 >
-            Z-
+            X-
                 </button>
               </Repeatable>
 
@@ -444,11 +444,11 @@ class JogController extends PureComponent {
                 repeatInterval={Math.floor(1000 / 15)}
                 onHold={() => {
                   const distance = this.getJogDistance();
-                  this.jog({ X: distance, Z: -distance });
+                  this.jog({ X: -distance, Z: distance });
                 }}
                 onRelease={() => {
                   const distance = this.getJogDistance();
-                  this.jog({ X: distance, Z: -distance });
+                  this.jog({ X: -distance, Z: distance });
                 }}
               >
                 <button
@@ -462,48 +462,48 @@ class JogController extends PureComponent {
               </Repeatable>
             </div>
             { (deviceMode === FOUR_AXIS_DEVICE_MODE || deviceMode === LASER_DEVICE_MODE) && (
-              <div className={styles.yAxeController}>
+              <div className={styles.cAxeController}>
                 <Repeatable
                   style={{ marginLeft: '7px' }}
-                  disabled={!canClickY}
+                  disabled={!canClickC}
                   repeatDelay={500}
                   repeatInterval={Math.floor(1000 / 15)}
                   onHold={() => {
                     const distance = this.getJogDistance();
-                    this.jog({ Y: distance });
+                    this.jog({ C: distance });
                   }}
                   onRelease={() => {
                     const distance = this.getJogDistance();
-                    this.jog({ Y: distance });
+                    this.jog({ C: distance });
                   }}
                 >
                   <button
                     type="button"
-                    className={styles.yAxeControllerButton}
-                    disabled={!canClickY}
+                    className={styles.cAxeControllerButton}
+                    disabled={!canClickC}
                   >
               +
                   </button>
                 </Repeatable>
-                <span className={styles.yAxeName}>Y</span>
+                <span className={styles.cAxeName}>C</span>
                 <Repeatable
                   style={{ marginLeft: '10px' }}
-                  disabled={!canClickY}
+                  disabled={!canClickC}
                   repeatDelay={500}
                   repeatInterval={Math.floor(1000 / 15)}
                   onHold={() => {
                     const distance = this.getJogDistance();
-                    this.jog({ Y: -distance });
+                    this.jog({ C: -distance });
                   }}
                   onRelease={() => {
                     const distance = this.getJogDistance();
-                    this.jog({ Y: -distance });
+                    this.jog({ C: -distance });
                   }}
                 >
                   <button
                     type="button"
-                    className={styles.yAxeControllerButton}
-                    disabled={!canClickY}
+                    className={styles.cAxeControllerButton}
+                    disabled={!canClickC}
                   >
               -
                   </button>
