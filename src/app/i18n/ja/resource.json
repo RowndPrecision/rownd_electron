@@ -350,5 +350,8 @@
     "SET": "設定",
     "CLR": "クリア",
     "Set RTS line status upon opening": "開くときにRTSラインの状態を設定する",
-    "Use RTS/CTS flow control": "RTS/CTSフロー制御を使用する"
+    "Use RTS/CTS flow control": "RTS/CTSフロー制御を使用する",
+    "PWM": "4 AXIS",
+    "ASDACN1": "LATHE",
+    "LASER": "LASER"
 }

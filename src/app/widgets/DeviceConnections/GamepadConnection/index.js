@@ -73,9 +73,9 @@ class GamepadConnection extends EventEmitter {
 
     this.lastCallTime = now;
 
-    const xValue = axes[0] !== undefined ? axes[0].toFixed(4) * 1000 : null;
-    const yValue = axes[1] !== undefined ? axes[1].toFixed(4) * 1000 : null;
-    const zValue = axes[3] !== undefined ? axes[3].toFixed(4) * 1000 : null;
+    const xValue = axes[1] !== undefined ? axes[1].toFixed(4) * 1000 : null;
+    const cValue = axes[3] !== undefined ? axes[3].toFixed(4) * 1000 : null;
+    const zValue = axes[0] !== undefined ? axes[0].toFixed(4) * 1000 : null;
 
     const minThreshold = Math.abs(0.05) * 1000; // Eşik değeri sabiti
 
@@ -86,21 +86,21 @@ class GamepadConnection extends EventEmitter {
     if (xValue !== null && Math.abs(xValue) > minThreshold) {
       const feedRateX = Math.abs(xValue);
       totalFeedRateSquared += feedRateX * feedRateX;
-      command += `X${axes[0]}`;
+      command += `X${axes[1].toFixed(4) * -1}`;
     }
 
-    // Y ekseni
-    if (yValue !== null && Math.abs(yValue) > minThreshold) {
-      const feedRateY = Math.abs(yValue);
-      totalFeedRateSquared += feedRateY * feedRateY;
-      command += `Y${axes[1]}`;
+    // C ekseni
+    if (cValue !== null && Math.abs(cValue) > minThreshold) {
+      const feedRateC = Math.abs(cValue);
+      totalFeedRateSquared += feedRateC * feedRateC;
+      command += `C${axes[3].toFixed(4) * -1}`;
     }
 
     // Z ekseni
     if (zValue !== null && Math.abs(zValue) > minThreshold) {
       const feedRateZ = Math.abs(zValue);
       totalFeedRateSquared += feedRateZ * feedRateZ;
-      command += `Z${axes[3]}`;
+      command += `Z${axes[0].toFixed(4)}`;
     }
 
     const feedRateCurT = Math.sqrt(totalFeedRateSquared);

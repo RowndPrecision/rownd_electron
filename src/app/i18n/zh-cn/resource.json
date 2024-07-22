@@ -350,5 +350,8 @@
     "SET": "设置",
     "CLR": "清除",
     "Set RTS line status upon opening": "打开时设置RTS线路状态",
-    "Use RTS/CTS flow control": "使用RTS/CTS流控制"
+    "Use RTS/CTS flow control": "使用RTS/CTS流控制",
+    "PWM": "4 AXIS",
+    "ASDACN1": "LATHE",
+    "LASER": "LASER"
 }

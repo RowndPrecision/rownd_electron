@@ -350,5 +350,8 @@
     "SET": "SETT",
     "CLR": "SLETT",
     "Set RTS line status upon opening": "Sett RTS-linjestatus ved åpning",
-    "Use RTS/CTS flow control": "Bruk RTS/CTS strømstyring"
+    "Use RTS/CTS flow control": "Bruk RTS/CTS strømstyring",
+    "PWM": "4 AXIS",
+    "ASDACN1": "LATHE",
+    "LASER": "LASER"
 }

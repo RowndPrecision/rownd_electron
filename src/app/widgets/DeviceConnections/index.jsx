@@ -6,6 +6,8 @@ import isElectron from 'is-electron';
 import log from 'app/lib/log';
 import i18n from 'app/lib/i18n';
 import store from 'app//store';
+import portal from 'app/lib/portal';
+import Modal from 'app/components/Modal';
 import espController from 'app/lib/controller';
 import { ToastNotification } from 'app/components/Notifications';
 import { GRBL,
@@ -21,6 +23,7 @@ import io from 'socket.io-client';
 import styles from './index.styl';
 import ConnectedDevice from './ConnectedDevice';
 import GamepadConnection from './GamepadConnection';
+import RowndButton from '../components/RowndButton';
 
 class DeviceConnections extends PureComponent {
     static propTypes = {
@@ -198,17 +201,6 @@ class DeviceConnections extends PureComponent {
 
       this.computerConnectionSocket.on('connect', () => {
         log.debug('Socket.IO Computer sunucusuna bağlantı kuruldu.');
-
-        const espPort = this.state.espPort;
-        const computerPort = this.state.computerPort;
-        const baudrate = this.state.computerBaudrate;
-
-        this.computerConnectionSocket.emit('open', espPort, computerPort, baudrate, (connection) => {
-          log.debug('open', JSON.stringify(espPort), JSON.stringify(computerPort), connection);
-          this.setState(state => ({
-            computerConnected: true
-          }));
-        });
       });
 
       this.computerConnectionSocket.on('computer:error', (err) => {
@@ -353,9 +345,54 @@ class DeviceConnections extends PureComponent {
       });
     }
 
+    openComputerConnection() {
+      const espPort = this.state.espPort;
+      const computerPort = this.state.computerPort;
+      const baudrate = this.state.computerBaudrate;
+
+      this.computerConnectionSocket.emit('open', espPort, computerPort, baudrate, (connection) => {
+        log.debug('open', JSON.stringify(espPort), JSON.stringify(computerPort), connection);
+        this.setState(state => ({
+          computerConnected: !state.computerConnected
+        }), () => {
+          espController.command('computer-connection', this.state.computerConnected);
+          this.openComputerConnectedPortal();
+        });
+      });
+    }
+
+    closeComputerConnection() {
+      this.computerConnectionSocket.emit('close', (err) => {
+        this.setState(state => ({
+          computerConnected: !state.computerConnected
+        }), () => {
+          espController.command('computer-connection', this.state.computerConnected);
+        });
+      });
+    }
+
+    openComputerConnectedPortal() {
+      portal(({ onClose }) => (
+        <Modal showCloseButton={false}>
+          <div style={{ padding: '0 20px 20px 20px' }}>
+            <h1 className={styles.computerConnectedMessage}>Computer Connected</h1>
+            <br />
+            <RowndButton
+              type="primary" onClick={
+                () => {
+                  this.closeComputerConnection();
+                  onClose();
+                }
+              } title="Disconnect"
+            />
+          </div>
+        </Modal>
+      ));
+    }
+
     render() {
-      const { espConnected, alertMessage, espController, computerConnected, phoneBLEConnected, gamepadConnected } = this.state;
-      const activeState = _.get(espController.state, 'status.activeState');
+      const { espConnected, alertMessage, computerConnected, phoneBLEConnected, gamepadConnected } = this.state;
+      const activeState = _.get(this.state.espController.state, 'status.activeState');
 
       const grblStateText = {
         [GRBL_ACTIVE_STATE_IDLE]: i18n.t('controller:Grbl.activeState.idle'),
@@ -383,7 +420,7 @@ class DeviceConnections extends PureComponent {
           )}
           <ConnectedDevice
             className={styles.connectedDevice}
-            deviceName={`ESP (${espController.type}) - ${grblStateText}`}
+            deviceName={`ESP (${this.state.espController.type}) - ${grblStateText}`}
             isConnected={espConnected}
             isManualConnectable
             onTapAction={() => {
@@ -407,8 +444,7 @@ class DeviceConnections extends PureComponent {
             onTapAction={async () => {
               if (isElectron()) {
                 const { ipcRenderer } = window.require('electron');
-                const result = await ipcRenderer.invoke('run-python-script');
-                console.log(result);
+                await ipcRenderer.invoke('run-python-script');
               }
             }}
           />
@@ -417,8 +453,14 @@ class DeviceConnections extends PureComponent {
             deviceName="Computer"
             isConnected={computerConnected}
             infoText="*For connect to computer please use your computer"
-            isManualConnectable={false}
-            onTapAction={() => {}}
+            isManualConnectable={true}
+            onTapAction={() => {
+              if (this.state.computerConnected) {
+                this.closeComputerConnection();
+              } else {
+                this.openComputerConnection();
+              }
+            }}
           />
         </div>
       );

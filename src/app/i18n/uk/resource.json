@@ -350,5 +350,8 @@
     "Run a tool change macro to change the tool and adjust the Z-axis offset. Afterwards, click the Resume button to resume program execution.": "Щоб змінити інструмент і налаштувати зміщення по осі Z, запустіть макрос зміни інструменту. Після цього натисніть кнопку «Відновити», щоб відновити виконання програми.",
     "Waiting for the target temperature to be reached...": "Очікування досягнення цільової температури...",
     "Resume": "Продовжити",
-    "Pause": "Пауза"
+    "Pause": "Пауза",
+    "PWM": "4 AXIS",
+    "ASDACN1": "LATHE",
+    "LASER": "LASER"
 }

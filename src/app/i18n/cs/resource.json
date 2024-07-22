@@ -350,5 +350,8 @@
     "SET": "NASTAVIT",
     "CLR": "VYMAZAT",
     "Set RTS line status upon opening": "Nastavit stav řádky RTS při otevírání",
-    "Use RTS/CTS flow control": "Použijte řízení toku RTS/CTS"
+    "Use RTS/CTS flow control": "Použijte řízení toku RTS/CTS",
+    "PWM": "4 AXIS",
+    "ASDACN1": "LATHE",
+    "LASER": "LASER"
 }

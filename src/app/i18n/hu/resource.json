@@ -350,5 +350,8 @@
     "SET": "BEÁLLÍT",
     "CLR": "TÖRLÉS",
     "Set RTS line status upon opening": "RTS vonal állapotának beállítása az nyitáskor",
-    "Use RTS/CTS flow control": "Használjon RTS/CTS áramvezérlést"
+    "Use RTS/CTS flow control": "Használjon RTS/CTS áramvezérlést",
+    "PWM": "4 AXIS",
+    "ASDACN1": "LATHE",
+    "LASER": "LASER"
 }

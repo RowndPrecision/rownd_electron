@@ -350,5 +350,8 @@
     "SET": "DEFINIR",
     "CLR": "LIMPAR",
     "Set RTS line status upon opening": "Definir status da linha RTS na abertura",
-    "Use RTS/CTS flow control": "Use o controle de fluxo RTS/CTS"
+    "Use RTS/CTS flow control": "Use o controle de fluxo RTS/CTS",
+    "PWM": "4 AXIS",
+    "ASDACN1": "LATHE",
+    "LASER": "LASER"
 }

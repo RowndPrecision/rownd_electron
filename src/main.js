@@ -48,8 +48,8 @@ function getBrowserWindowOptions() {
     minHeight: 1024,
     minWidth: 768,
     show: false,
-    fullscreen: true,
-    kiosk: true,
+    fullscreen: false,
+    kiosk: false,
     title: `${pkg.name} ${pkg.version}`,
 
     // useContentSize boolean (optional) - The width and height would be used as web page's size, which means the actual window's size will include window frame's size and be slightly larger. Default is false.

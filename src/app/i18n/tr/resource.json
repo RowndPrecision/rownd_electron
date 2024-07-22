@@ -350,5 +350,8 @@
     "SET": "AYARLA",
     "CLR": "TEMİZLE",
     "Set RTS line status upon opening": "Açılışta RTS hat durumunu ayarla",
-    "Use RTS/CTS flow control": "RTS/CTS akış kontrolü kullanın"
+    "Use RTS/CTS flow control": "RTS/CTS akış kontrolü kullanın",
+    "PWM": "4 AXIS",
+    "ASDACN1": "LATHE",
+    "LASER": "LASER"
 }

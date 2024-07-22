@@ -113,6 +113,15 @@ class Workspace extends PureComponent {
           this.action.openModal(MODAL_SERVER_DISCONNECTED);
         }
       },
+      'serialport:read': (data) => {
+        if (data.includes('$37')) {
+          let match = data.split('=');
+          if (match && match[1]) {
+            let value = match[1].trim();
+            this.setState({ selectedDeviceMode: value });
+          }
+        }
+      },
       'serialport:open': (options) => {
         const { port } = options;
         this.setState({ port: port });
@@ -227,6 +236,12 @@ class Workspace extends PureComponent {
         // A workaround solution to trigger componentDidUpdate on initial render
         this.setState({ mounted: true });
       }, 0);
+
+
+      setTimeout(() => {
+        // Device Current Mode
+        controller.command('gcode', '$37');
+      }, 500);
     }
 
     componentWillUnmount() {
@@ -336,7 +351,10 @@ class Workspace extends PureComponent {
                   <DeviceModeSelection
                     modes={DEVICE_MODES}
                     selectedDeviceMode={selectedDeviceMode}
-                    onChange={(mode) => this.setState({ selectedDeviceMode: mode })}
+                    onChange={(mode) => this.setState(state => ({
+                      selectedDeviceMode: mode
+                    }), () => controller.command('gcode', '$37=' + mode))
+                    }
                   />
                   <DeviceAxes deviceMode={selectedDeviceMode} />
                   <DeviceController deviceMode={selectedDeviceMode} />

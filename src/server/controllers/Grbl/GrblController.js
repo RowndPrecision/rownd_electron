@@ -130,6 +130,9 @@ class GrblController {
     // Workflow
     workflow = null;
 
+    // Computer Connection
+    computerConnection = false
+
     constructor(engine, options) {
       if (!engine) {
         throw new Error('engine must be specified');
@@ -595,7 +598,7 @@ class GrblController {
 
       const queryStatusReport = () => {
         // Check the ready flag
-        if (!(this.ready)) {
+        if (!(this.ready) || this.computerConnection) {
           return;
         }
 
@@ -627,7 +630,7 @@ class GrblController {
 
       const queryParserState = _.throttle(() => {
         // Check the ready flag
-        if (!(this.ready)) {
+        if (!(this.ready) || this.computerConnection) {
           return;
         }
 
@@ -1380,7 +1383,21 @@ class GrblController {
 
             this.command('gcode:load', file, data, context, callback);
           });
-        }
+        },
+        'computer-connection': () => {
+          const [isConnected] = args;
+          this.computerConnection = isConnected;
+        },
+        'computer-connection:gcode': () => {
+          const [commands, context = {}] = args;
+          this.command('gcode', commands, context);
+          console.log('computer-connection:gcode', commands);
+          if (commands === '$G') {
+            setTimeout(() => {
+              this.command('gcode', '?', context);
+            }, 1000);
+          }
+        },
       }[cmd];
 
       if (!handler) {

@@ -1,6 +1,8 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
+import i18n from 'app/lib/i18n';
+import { FOUR_AXIS_DEVICE_MODE, LATHE_DEVICE_MODE, LASER_DEVICE_MODE } from 'app/constants';
 import styles from './index.styl';
 
 class DeviceModeSelection extends PureComponent {
@@ -15,6 +17,12 @@ class DeviceModeSelection extends PureComponent {
       this.state = {
         selectedMode: props.selectedDeviceMode || props.modes[0],
       };
+    }
+
+    componentDidUpdate(prevProps) {
+      if (this.props.selectedDeviceMode !== prevProps.selectedDeviceMode) {
+        this.setState({ selectedMode: this.props.selectedDeviceMode });
+      }
     }
 
       handleSelection = (mode) => {
@@ -38,7 +46,9 @@ class DeviceModeSelection extends PureComponent {
                   className={cx(styles.mode, { [styles.selected]: isSelected })}
                   key={index}
                 >
-                  <p>{mode}</p>
+                  { mode === FOUR_AXIS_DEVICE_MODE && <p>{i18n._('PWM')} </p> }
+                  { mode === LATHE_DEVICE_MODE && <p>{i18n._('ASDACN1')} </p> }
+                  { mode === LASER_DEVICE_MODE && <p>{i18n._('LASER')} </p> }
                   <p style={{ fontSize: '16px' }}>Mode</p>
                 </button>
               );

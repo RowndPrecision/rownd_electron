@@ -27,26 +27,16 @@ class ComputerConnection {
 
     espPort = null;
 
+    isSendedFirstReportOK = false
+
     connectionEventListener = {
       data: (data) => {
-        this.espController.command('gcode', data, (err, state) => {
+        this.espController.command('computer-connection:gcode', data, (err, state) => {
           this.socket.emit('computer:data', data, err, state);
         });
       },
       close: (err) => {
         this.socket.emit('computer:close', err);
-        if (this.connection) {
-          this.connection = null;
-        }
-        this.close(err => {
-          if (this.connection) {
-            this.connection = null;
-          }
-
-          this.espController = null;
-          this.espPort = null;
-          this.port = null;
-        });
       },
       error: (err) => {
         if (err) {
@@ -55,8 +45,20 @@ class ComputerConnection {
         this.socket.emit('computer:error', err);
       },
       espData: (data) => {
-        this.connection.write(data + '\n');
-        this.socket.emit('computer-esp:data', data);
+        if (!this.connection) {
+          return;
+        }
+        const command = String(data).trim();
+        if (command.length === 0) {
+          return;
+        }
+        if (command === 'ok' && !this.isSendedFirstReportOK) {
+          this.isSendedFirstReportOK = true;
+          return;
+        }
+        console.log('espdata', command);
+        this.connection.write(command + '\n');
+        this.socket.emit('computer-esp:data', command);
       },
     };
 
@@ -138,15 +140,11 @@ class ComputerConnection {
         });
 
         // Close serial port
-        socket.on('close', (port, callback = noop) => {
+        socket.on('close', (callback = noop) => {
           if (typeof callback !== 'function') {
             callback = noop;
           }
-
-          this.close();
-
-          // Leave the room
-          socket.leave(port);
+          this.close(callback);
         });
       });
     }
@@ -196,8 +194,18 @@ class ComputerConnection {
         return;
       }
 
-      this.connection.removeAllListeners();
-      this.connection.close(callback);
+      this.connection.close(() => {
+        this.connection.removeAllListeners();
+        this.espController.connection.off('data', this.connectionEventListener.espData);
+        this.isSendedFirstReportOK = false;
+
+        this.connection = null;
+        this.espController = null;
+        this.espPort = null;
+        this.port = null;
+
+        callback();
+      });
     }
 }
 
