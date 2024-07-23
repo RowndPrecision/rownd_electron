@@ -2,23 +2,31 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Repeatable from 'react-repeatable';
 import cx from 'classnames';
+import playArrowIcon from './images/play-arrow.svg';
+import stopIcon from './images/stop.svg';
 import styles from './index.styl';
 
 class Speedometer extends PureComponent {
     static propTypes = {
       min: PropTypes.number,
       max: PropTypes.number,
+      cur: PropTypes.number,
       unitName: PropTypes.string,
       onChange: PropTypes.func,
+      onStart: PropTypes.func,
+      onStop: PropTypes.func,
       disabled: PropTypes.bool,
-      step: PropTypes.number
+      step: PropTypes.number,
+      onlyShowSpeedometer: PropTypes.bool
     };
 
     constructor(props) {
       super(props);
 
       this.state = {
-        currentValue: 0
+        currentValue: props.cur,
+        isClockwise: true,
+        isRunning: false
       };
       this.totalLines = 100;
     }
@@ -56,18 +64,30 @@ class Speedometer extends PureComponent {
     updateValue(offset) {
       const { min, max } = this.props;
       const newValue = Math.min(Math.max(this.state.currentValue + offset, min), max);
-      this.props.onChange(newValue);
-
-      this.setState({ currentValue: newValue });
+      
+      this.setState({ currentValue: newValue }, () => {
+        this.props.onChange(newValue);
+      });
     }
 
     render() {
-      const { currentValue } = this.state;
-      const { min, max, unitName, disabled, step } = this.props;
+      const { currentValue, isRunning, isClockwise } = this.state;
+      const { min, max, unitName, disabled, step, onStart, onStop, onlyShowSpeedometer } = this.props;
       const lines = this.createLineElements((currentValue / max) * 100);
 
       return (
         <div className={styles.speedometerContainer}>
+          {!onlyShowSpeedometer && <div className={styles.rotationControl}>
+            <div className={styles.counterClockwiseButton} 
+              style={{ backgroundColor: !isClockwise ? '#9747FF' : '#111219' }} 
+              onClick={() => !disabled ? this.setState({ isClockwise: false }) : null} 
+            />
+            <div className={styles.clockwiseButton} 
+              style={{ backgroundColor: isClockwise ? '#9747FF' : '#111219' }} 
+              onClick={() => !disabled ? this.setState({ isClockwise: true }) : null} 
+            />
+          </div>
+    }
           <div className={styles.speedometer}>
             <div className={styles.speedLabel}>
               <div className={styles.currentSpeedValue}>{currentValue}</div>
@@ -75,7 +95,17 @@ class Speedometer extends PureComponent {
             </div>
             {lines}
           </div>
-          <div className={styles.numberPicker}>
+          {!onlyShowSpeedometer && <div className={styles.startStopButton} 
+          onClick={!disabled ? () => {
+                this.setState({isRunning: !isRunning}, () => {
+                  isRunning ? onStart(currentValue) : onStop() 
+                }) 
+          } : null }>
+            <img src={isRunning ? stopIcon : playArrowIcon} className={styles.startStopButtonIcon} />
+            <div className={styles.startStopButtonText} style={{ color: isRunning ? '#DE0050' : '#36A900'}}>{isRunning ? 'Stop' : 'Start'}</div>
+          </div>
+    }
+          {!onlyShowSpeedometer && <div className={styles.numberPicker}>
             <Repeatable
               disabled={disabled}
               repeatDelay={500}
@@ -117,6 +147,7 @@ class Speedometer extends PureComponent {
               </button>
             </Repeatable>
           </div>
+    }
         </div>
       );
     }

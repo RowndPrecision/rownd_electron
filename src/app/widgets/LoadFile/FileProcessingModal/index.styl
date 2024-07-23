@@ -1,0 +1,113 @@
+.fileProcessingModal {
+    padding: 0 20px 20px 20px;
+    border: 0.5px solid #08F7FE;
+    background: #111219;
+    border-radius: 8px;
+    margin: -4px;
+
+    &Header {
+        background: rgba(8, 247, 254, 0.20);
+        display: flex;
+        align-items: center;
+        margin: 0 -20px;
+        height: 60px;
+        justify-content: center;
+
+      &Icon {
+        width: 28px;
+        height: 28px;
+    }
+  
+        &Text {
+            margin-left: 8px;
+            color: #08F7FE;
+            font-family: "PT Sans";
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 14px;
+            letter-spacing: 0.7px;
+            text-transform: capitalize;
+        }
+    }  
+     &Content {
+        display: grid;
+        grid-template-columns: auto auto;
+        gap: 20px;
+
+        &AxePositions {
+            padding: 40px;
+            display: grid;
+            gap: 10px;
+        }
+
+        &Speedometer {
+            width: 320px;
+            padding: 40px;
+            height: 0
+        }
+    } 
+
+    &Footer {
+        padding: 30px;
+        margin: 0 40px;
+        border-radius: 8px;
+        border: 0.5px solid #99A5FF;
+        background: #000;
+
+        &GCodeStats {
+            display: grid;
+            grid-template-columns: auto auto;
+            width: 100%;
+            gap: 20px;
+
+            &Time {
+                &Label{
+                    color: #99A5FF;
+                    font-family: "PT Mono";
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 400;
+                    line-height: normal;
+                    letter-spacing: 0.8px;
+                }
+                &Value {
+                    color: #FFF;
+                    font-family: "PT Mono";
+                    font-size: 18px;
+                    font-style: normal;
+                    font-weight: 400;
+                    line-height: normal;
+                    letter-spacing: 0.9px;
+                }
+            }
+            
+        }
+
+        &Actions {
+        width: 100%;
+        margin: 20px 0;
+    
+    &ProgressBar {
+            &StatusText {
+                color: #FFF;
+                text-align: center;
+                font-family: "PT Mono";
+                font-size: 12px;
+                font-style: normal;
+                font-weight: 400;
+                line-height: normal;
+                letter-spacing: 0.6px;  
+                margin-top: 10px;  
+            }
+        }
+
+&WorkflowControlButtons {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    }
+    }
+}

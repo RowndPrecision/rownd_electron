@@ -15,11 +15,11 @@ import {
   GRBL_ACTIVE_STATE_IDLE,
   GRBL_ACTIVE_STATE_RUN,
   AXIS_X,
-  AXIS_Y,
   AXIS_Z,
   WORKFLOW_STATE_RUNNING,
   LASER_DEVICE_MODE,
-  FOUR_AXIS_DEVICE_MODE
+  FOUR_AXIS_DEVICE_MODE,
+  AXIS_C
 } from '../../constants';
 import homeIcon from './images/home-outline.svg';
 
@@ -94,7 +94,7 @@ class DeviceAxes extends PureComponent {
           type: espController.type,
           state: espController.state
         },
-        axes: ['x', 'y', 'z'],
+        axes: ['x', 'c', 'z'],
         machinePosition: { // Machine position
           x: '0.000',
           y: '0.000',
@@ -179,16 +179,16 @@ class DeviceAxes extends PureComponent {
       };
 
       const mposXAsix = state.machinePosition[AXIS_X] || '0.000';
-      const mposYAsix = state.machinePosition[AXIS_Y] || '0.000';
+      const mposCAsix = state.machinePosition[AXIS_C] || '0.000';
       const mposZAsix = state.machinePosition[AXIS_Z] || '0.000';
       const wposXAsix = state.workPosition[AXIS_X] || '0.000';
-      const wposYAsix = state.workPosition[AXIS_Y] || '0.000';
+      const wposCAsix = state.workPosition[AXIS_C] || '0.000';
       const wposZAxis = state.workPosition[AXIS_Z] || '0.000';
 
       const canClickX = state.canClick && includes(axes, 'x');
       const canClickZ = state.canClick && includes(axes, 'z');
-      const canClickY = state.canClick && includes(axes, 'y');
-      const canClickXYZ = canClickX && canClickY && canClickZ;
+      const canClickC = state.canClick && includes(axes, 'c');
+      const canClickXCZ = canClickX && canClickC && canClickZ;
       const canClickXZ = canClickX && canClickZ;
 
       return (
@@ -202,9 +202,9 @@ class DeviceAxes extends PureComponent {
             { (deviceMode === FOUR_AXIS_DEVICE_MODE || deviceMode === LASER_DEVICE_MODE) &&
             (
               <DeviceAxePositon
-                name="Y"
-                machinePosition={mposYAsix}
-                workPosition={wposYAsix}
+                name="C"
+                machinePosition={mposCAsix}
+                workPosition={wposCAsix}
               />
             ) }
             <DeviceAxePositon
@@ -217,15 +217,15 @@ class DeviceAxes extends PureComponent {
           <div className={styles.axePositionsReset}>
             <RowndButton
               title={(deviceMode === FOUR_AXIS_DEVICE_MODE || deviceMode === LASER_DEVICE_MODE)
-                ? 'Go XYZ'
+                ? 'Go XCZ'
                 : 'Go XZ'}
               type="primary"
               disabled={(deviceMode === FOUR_AXIS_DEVICE_MODE || deviceMode === LASER_DEVICE_MODE)
-                ? !canClickXYZ
+                ? !canClickXCZ
                 : !canClickXZ
               }
               onClick={() => ((deviceMode === FOUR_AXIS_DEVICE_MODE || deviceMode === LASER_DEVICE_MODE)
-                ? this.move({ X: 0, Y: 0, Z: 0 })
+                ? this.move({ X: 0, C: 0, Z: 0 })
                 : this.move({ X: 0, Z: 0 }))}
             />
             <RowndButton
@@ -235,9 +235,9 @@ class DeviceAxes extends PureComponent {
             />
             { (deviceMode === FOUR_AXIS_DEVICE_MODE || deviceMode === LASER_DEVICE_MODE) && (
               <RowndButton
-                title="Go Y0" type="primary"
-                disabled={!canClickY}
-                onClick={() => this.move({ Y: 0 })}
+                title="Go C0" type="primary"
+                disabled={!canClickC}
+                onClick={() => this.move({ C: 0 })}
               />
             ) }
             <RowndButton

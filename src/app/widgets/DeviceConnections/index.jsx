@@ -1,13 +1,12 @@
 import React, { PureComponent } from 'react';
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
-// import PropTypes from 'prop-types';
 // import cx from 'classnames';
 import log from 'app/lib/log';
 import i18n from 'app/lib/i18n';
 import store from 'app//store';
 import portal from 'app/lib/portal';
-import Modal from 'app/components/Modal';
 import espController from 'app/lib/controller';
 import { ToastNotification } from 'app/components/Notifications';
 import { GRBL,
@@ -23,10 +22,11 @@ import io from 'socket.io-client';
 import styles from './index.styl';
 import ConnectedDevice from './ConnectedDevice';
 import GamepadConnection from './GamepadConnection';
-import RowndButton from '../components/RowndButton';
+import ComputerConnectionModal from './ComputerConnectionModal';
 
 class DeviceConnections extends PureComponent {
     static propTypes = {
+      deviceMode: PropTypes.string
     };
 
     state = this.getInitialState();
@@ -373,20 +373,10 @@ class DeviceConnections extends PureComponent {
 
     openComputerConnectedPortal() {
       portal(({ onClose }) => (
-        <Modal showCloseButton={false}>
-          <div style={{ padding: '0 20px 20px 20px' }}>
-            <h1 className={styles.computerConnectedMessage}>Computer Connected</h1>
-            <br />
-            <RowndButton
-              type="primary" onClick={
-                () => {
-                  this.closeComputerConnection();
-                  onClose();
-                }
-              } title="Disconnect"
-            />
-          </div>
-        </Modal>
+        <ComputerConnectionModal deviceMode={this.props.deviceMode} onClose={() => {
+          this.closeComputerConnection();
+          onClose();
+        }} />
       ));
     }
 

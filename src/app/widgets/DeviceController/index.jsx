@@ -11,7 +11,9 @@ import { LASER_DEVICE_MODE,
   GRBL,
   GRBL_ACTIVE_STATE_IDLE,
   GRBL_ACTIVE_STATE_HOLD,
-  WORKFLOW_STATE_RUNNING } from '../../constants';
+  WORKFLOW_STATE_RUNNING, 
+  FOUR_AXIS_DEVICE_MODE} from '../../constants';
+import SliderInput from '../components/SliderInput';
 
 class DeviceController extends PureComponent {
     static propTypes = {
@@ -65,6 +67,7 @@ class DeviceController extends PureComponent {
 
     componentDidMount() {
       this.addControllerEvents();
+      espController.command('gcode', 'M5');
     }
 
     componentWillUnmount() {
@@ -119,13 +122,6 @@ class DeviceController extends PureComponent {
     handleSpindleSpeedChange(value) {
       const spindleSpeed = Number(value) || 0;
       this.setState({ spindleSpeed: spindleSpeed });
-
-      if (spindleSpeed > 0) {
-        espController.command('gcode', 'M3 S' + spindleSpeed);
-      } else {
-        espController.command('gcode', 'M3');
-        espController.command('gcode', 'M5');
-      }
     }
 
     render() {
@@ -137,23 +133,26 @@ class DeviceController extends PureComponent {
 
       return (
         <div className={styles.deviceControllerWidget}>
-          <Speedometer
+          {
+            (deviceMode === LASER_DEVICE_MODE) ? 
+            <SliderInput min={0} max={100} cur={0} disabled={!state.canClick} onChange={(value) => console.log(value)} />
+            : 
+            <Speedometer
             min={0}
-            max={(deviceMode === LASER_DEVICE_MODE) ? 100 : 3000}
-            step={(deviceMode === LASER_DEVICE_MODE) ? 1 : 10}
-            unitName={(deviceMode === LASER_DEVICE_MODE) ? 'VOLT' : 'RPM'}
+            max={(deviceMode === FOUR_AXIS_DEVICE_MODE) ? 12000 : 3000}
+            step={10}
+            unitName={'RPM'}
             disabled={!state.canClick}
+            onStart={(isClockwise) =>  espController.command('gcode', isClockwise ? 'M3 S' + state.spindleSpeed : 'M4 S' + state.spindleSpeed)}
+            onStop={() => espController.command('gcode', 'M5')}
             onChange={(value) => {
               if (!state.canClick) {
                 return;
               }
-              if (deviceMode === LASER_DEVICE_MODE) {
-                console.log(value);
-              } else {
-                this.handleSpindleSpeedChange(value);
-              }
+              this.handleSpindleSpeedChange(value);
             }}
           />
+          }
           <JogController deviceMode={deviceMode} />
         </div>
       );

@@ -39,7 +39,7 @@ import {
   NOTIFICATION_M190_SET_HEATED_BED_TEMPERATURE
 } from './constants';
 import Loading from './Loading';
-import GCodeStats from '../GCodeStats';
+import FileProcessingModal from './FileProcessingModal';
 
 const translateExpression = (function() {
   const { Parser } = ExpressionEvaluator;
@@ -81,7 +81,8 @@ class LoadFile extends PureComponent {
       expectedChunks: PropTypes.number,
       onFileSelect: PropTypes.func,
       filePath: PropTypes.string,
-      openFileDialog: PropTypes.func
+      openFileDialog: PropTypes.func,
+      deviceMode: PropTypes.string
     };
 
     state = this.getInitialState();
@@ -291,16 +292,7 @@ class LoadFile extends PureComponent {
       },
       openGCodeStatsWidgetModal: () => {
         portal(({ onClose }) => (
-          <Modal size="lg" onClose={onClose}>
-            <Modal.Header>
-              <Modal.Title>
-                G-Code Stats
-              </Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <GCodeStats />
-            </Modal.Body>
-          </Modal>
+          <FileProcessingModal onClose={onClose} deviceMode={this.props.deviceMode}  />
         ));
       },
       handlePause: () => {

@@ -347,7 +347,7 @@ class Workspace extends PureComponent {
                     styles.defaultContainer,
                   )}
                 >
-                  <DeviceConnections />
+                  <DeviceConnections deviceMode={selectedDeviceMode} />
                   <DeviceModeSelection
                     modes={DEVICE_MODES}
                     selectedDeviceMode={selectedDeviceMode}
@@ -358,7 +358,7 @@ class Workspace extends PureComponent {
                   />
                   <DeviceAxes deviceMode={selectedDeviceMode} />
                   <DeviceController deviceMode={selectedDeviceMode} />
-                  <LoadFile />
+                  <LoadFile deviceMode={selectedDeviceMode} />
                 </div>
               </div>
             </div>
