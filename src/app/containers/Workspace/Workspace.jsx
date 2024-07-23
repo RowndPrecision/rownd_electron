@@ -7,7 +7,8 @@ import { withRouter } from 'react-router-dom';
 import api from 'app/api';
 import {
   WORKFLOW_STATE_IDLE,
-  DEVICE_MODES
+  DEVICE_MODES,
+  LATHE_DEVICE_MODE
 } from 'app/constants';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
@@ -240,6 +241,7 @@ class Workspace extends PureComponent {
 
       setTimeout(() => {
         // Device Current Mode
+        controller.command('gcode', '$37=' + LATHE_DEVICE_MODE);
         controller.command('gcode', '$37');
       }, 500);
     }

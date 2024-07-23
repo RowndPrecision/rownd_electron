@@ -373,10 +373,12 @@ class DeviceConnections extends PureComponent {
 
     openComputerConnectedPortal() {
       portal(({ onClose }) => (
-        <ComputerConnectionModal deviceMode={this.props.deviceMode} onClose={() => {
-          this.closeComputerConnection();
-          onClose();
-        }} />
+        <ComputerConnectionModal
+          deviceMode={this.props.deviceMode} onClose={() => {
+            this.closeComputerConnection();
+            onClose();
+          }}
+        />
       ));
     }
 

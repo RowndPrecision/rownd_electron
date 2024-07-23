@@ -20,162 +20,160 @@ import Speedometer from '../../DeviceController/Speedometer';
 
 class ComputerConnectionModal extends PureComponent {
     static propTypes = {
-        onClose: PropTypes.func,
-        deviceMode: PropTypes.string
+      onClose: PropTypes.func,
+      deviceMode: PropTypes.string
     };
 
     state = this.getInitialState();
 
     controllerEvents = {
-        'controller:state': (type, controllerState) => {
-            const { status } = { ...controllerState };
-            const { mpos, wpos } = status;
-            const $13 = Number(get(espController.settings, 'settings.$13', 0)) || 0;
-  
-            this.setState(state => ({
-              controller: {
-                ...state.controller,
-                type: type,
-                state: controllerState
-              },
-              // Machine position are reported in mm ($13=0) or inches ($13=1)
-              machinePosition: mapValues({
-                ...state.machinePosition,
-                ...mpos
-              }, (val) => {
-                return ($13 > 0) ? in2mm(val) : val;
-              }),
-              // Work position are reported in mm ($13=0) or inches ($13=1)
-              workPosition: mapValues({
-                ...state.workPosition,
-                ...wpos
-              }, val => {
-                return ($13 > 0) ? in2mm(val) : val;
-              })
-            }));
-        }
-      }
+      'controller:state': (type, controllerState) => {
+        const { status } = { ...controllerState };
+        const { mpos, wpos, spindle } = status;
+        const $13 = Number(get(espController.settings, 'settings.$13', 0)) || 0;
 
-      componentDidMount() {
-        this.addControllerEvents();
-      }
-  
-      componentWillUnmount() {
-        this.removeControllerEvents();
-      }
-  
-      getInitialState() {
-        return {
-          units: METRIC_UNITS,
+        console.log('--> ', JSON.stringify(controllerState));
+
+        this.setState(state => ({
+          spindleSpeed: spindle,
           controller: {
-            type: espController.type,
-            state: espController.state
+            ...state.controller,
+            type: type,
+            state: controllerState
           },
-          machinePosition: { // Machine position
-            x: '0.000',
-            y: '0.000',
-            z: '0.000',
-            a: '0.000',
-            b: '0.000',
-            c: '0.000'
-          },
-          workPosition: { // Work position
-            x: '0.000',
-            y: '0.000',
-            z: '0.000',
-            a: '0.000',
-            b: '0.000',
-            c: '0.000'
-          },
-          spindleSpeed: 0
-        };
+          // Machine position are reported in mm ($13=0) or inches ($13=1)
+          machinePosition: mapValues({
+            ...state.machinePosition,
+            ...mpos
+          }, (val) => {
+            return ($13 > 0) ? in2mm(val) : val;
+          }),
+          // Work position are reported in mm ($13=0) or inches ($13=1)
+          workPosition: mapValues({
+            ...state.workPosition,
+            ...wpos
+          }, val => {
+            return ($13 > 0) ? in2mm(val) : val;
+          }),
+        }));
       }
+    }
+
+    componentDidMount() {
+      this.addControllerEvents();
+    }
+
+    componentWillUnmount() {
+      this.removeControllerEvents();
+    }
+
+    getInitialState() {
+      return {
+        units: METRIC_UNITS,
+        controller: {
+          type: espController.type,
+          state: espController.state
+        },
+        machinePosition: { // Machine position
+          x: '0.000',
+          y: '0.000',
+          z: '0.000',
+          a: '0.000',
+          b: '0.000',
+          c: '0.000'
+        },
+        workPosition: { // Work position
+          x: '0.000',
+          y: '0.000',
+          z: '0.000',
+          a: '0.000',
+          b: '0.000',
+          c: '0.000'
+        },
+        spindleSpeed: 0
+      };
+    }
 
     addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-          const callback = this.controllerEvents[eventName];
-          espController.addListener(eventName, callback);
-        });
-      }
-  
-      removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-          const callback = this.controllerEvents[eventName];
-          espController.removeListener(eventName, callback);
-        });
-      }
+      Object.keys(this.controllerEvents).forEach(eventName => {
+        const callback = this.controllerEvents[eventName];
+        espController.addListener(eventName, callback);
+      });
+    }
 
-      handleSpindleSpeedChange(value) {
-        const spindleSpeed = Number(value) || 0;
-        this.setState({ spindleSpeed: spindleSpeed });
-      }
+    removeControllerEvents() {
+      Object.keys(this.controllerEvents).forEach(eventName => {
+        const callback = this.controllerEvents[eventName];
+        espController.removeListener(eventName, callback);
+      });
+    }
 
-      render() {
-        const { units, machinePosition, workPosition } = this.state;
-        const { onClose, deviceMode} = this.props;
-        const state = {
-          ...this.state,
-          // Output machine position with the display units
-          machinePosition: mapValues(machinePosition, (pos, axis) => {
-            return String(mapPositionToUnits(pos, units));
-          }),
-          // Output work position with the display units
-          workPosition: mapValues(workPosition, (pos, axis) => {
-            return String(mapPositionToUnits(pos, units));
-          })
-        };
+    render() {
+      const { units, machinePosition, workPosition } = this.state;
+      const { onClose, deviceMode } = this.props;
+      const state = {
+        ...this.state,
+        // Output machine position with the display units
+        machinePosition: mapValues(machinePosition, (pos, axis) => {
+          return String(mapPositionToUnits(pos, units));
+        }),
+        // Output work position with the display units
+        workPosition: mapValues(workPosition, (pos, axis) => {
+          return String(mapPositionToUnits(pos, units));
+        }),
+      };
 
-        const mposXAsix = state.machinePosition[AXIS_X] || '0.000';
-        const mposCAsix = state.machinePosition[AXIS_C] || '0.000';
-        const mposZAsix = state.machinePosition[AXIS_Z] || '0.000';
-        const wposXAsix = state.workPosition[AXIS_X] || '0.000';
-        const wposCAsix = state.workPosition[AXIS_C] || '0.000';
-        const wposZAxis = state.workPosition[AXIS_Z] || '0.000';
+      const mposXAsix = state.machinePosition[AXIS_X] || '0.000';
+      const mposCAsix = state.machinePosition[AXIS_C] || '0.000';
+      const mposZAsix = state.machinePosition[AXIS_Z] || '0.000';
+      const wposXAsix = state.workPosition[AXIS_X] || '0.000';
+      const wposCAsix = state.workPosition[AXIS_C] || '0.000';
+      const wposZAxis = state.workPosition[AXIS_Z] || '0.000';
 
-        return (
-            <Modal showCloseButton={false}>
-            <div className={styles.computerConnectedModal}>
-              <div className={styles.computerConnectedModalHeader}>
-                <img src={computerConnectedIcon} className={styles.computerConnectedModalHeaderIcon} />
-                <div className={styles.computerConnectedModalHeaderText}>Computer Connected</div>
-              </div>
-              <div className={styles.computerConnectedModalContent}>
+      return (
+        <Modal showCloseButton={false}>
+          <div className={styles.computerConnectedModal}>
+            <div className={styles.computerConnectedModalHeader}>
+              <img src={computerConnectedIcon} className={styles.computerConnectedModalHeaderIcon} alt="Computer Connected" />
+              <div className={styles.computerConnectedModalHeaderText}>Computer Connected</div>
+            </div>
+            <div className={styles.computerConnectedModalContent}>
               <div className={styles.computerConnectedModalContentAxePositions}>
                 <DeviceAxePositon
-                    name="X"
-                    machinePosition={mposXAsix}
-                    workPosition={wposXAsix}
+                  name="X"
+                  machinePosition={mposXAsix}
+                  workPosition={wposXAsix}
                 />
                 <DeviceAxePositon
-                    name="C"
-                    machinePosition={mposCAsix}
-                    workPosition={wposCAsix}
-                    />
-                <DeviceAxePositon
-                    name="Z"
-                    machinePosition={mposZAsix}
-                    workPosition={wposZAxis}
+                  name="C"
+                  machinePosition={mposCAsix}
+                  workPosition={wposCAsix}
                 />
-            </div>
-                <div className={styles.computerConnectedModalContentSpeedometer}>
+                <DeviceAxePositon
+                  name="Z"
+                  machinePosition={mposZAsix}
+                  workPosition={wposZAxis}
+                />
+              </div>
+              <div className={styles.computerConnectedModalContentSpeedometer}>
                 <Speedometer
-            min={0}
-            max={(deviceMode === FOUR_AXIS_DEVICE_MODE) ? 12000 : 3000}
-            step={10}
-            unitName={'RPM'}
-            disabled={true}
-            cur={20}
-            onlyShowSpeedometer={true}
-          />
-                </div>
-              </div>
-              <div className={styles.computerConnectedModalFooter}>
-              <RowndButton type="secondary" onClick={() => onClose()} title="Disconnect"/>
+                  min={0}
+                  max={(deviceMode === FOUR_AXIS_DEVICE_MODE) ? 12000 : 3000}
+                  step={10}
+                  unitName="RPM"
+                  disabled={true}
+                  cur={state.spindleSpeed}
+                  onlyShowSpeedometer={true}
+                />
               </div>
             </div>
-          </Modal>
-        )
-      }
+            <div className={styles.computerConnectedModalFooter}>
+              <RowndButton type="secondary" onClick={() => onClose()} title="Disconnect" />
+            </div>
+          </div>
+        </Modal>
+      );
+    }
 }
 
 export default ComputerConnectionModal;

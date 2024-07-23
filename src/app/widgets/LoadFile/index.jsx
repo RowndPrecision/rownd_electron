@@ -292,7 +292,7 @@ class LoadFile extends PureComponent {
       },
       openGCodeStatsWidgetModal: () => {
         portal(({ onClose }) => (
-          <FileProcessingModal onClose={onClose} deviceMode={this.props.deviceMode}  />
+          <FileProcessingModal onClose={onClose} deviceMode={this.props.deviceMode} />
         ));
       },
       handlePause: () => {

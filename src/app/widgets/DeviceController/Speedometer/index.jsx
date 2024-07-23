@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Repeatable from 'react-repeatable';
@@ -24,11 +26,17 @@ class Speedometer extends PureComponent {
       super(props);
 
       this.state = {
-        currentValue: props.cur,
+        currentValue: props.cur || 0,
         isClockwise: true,
         isRunning: false
       };
       this.totalLines = 100;
+    }
+
+    componentDidUpdate(prevProps) {
+      if (this.props.cur !== prevProps.cur) {
+        this.setState({ currentValue: this.props.cur });
+      }
     }
 
     createLineElements(filledPercent) {
@@ -62,11 +70,12 @@ class Speedometer extends PureComponent {
     }
 
     updateValue(offset) {
-      const { min, max } = this.props;
-      const newValue = Math.min(Math.max(this.state.currentValue + offset, min), max);
-      
+      const { min, max, onChange } = this.props;
+      const { currentValue, isRunning, isClockwise } = this.state;
+      const newValue = Math.min(Math.max(currentValue + offset, min), max);
+
       this.setState({ currentValue: newValue }, () => {
-        this.props.onChange(newValue);
+        onChange(newValue, isClockwise, isRunning);
       });
     }
 
@@ -77,17 +86,21 @@ class Speedometer extends PureComponent {
 
       return (
         <div className={styles.speedometerContainer}>
-          {!onlyShowSpeedometer && <div className={styles.rotationControl}>
-            <div className={styles.counterClockwiseButton} 
-              style={{ backgroundColor: !isClockwise ? '#9747FF' : '#111219' }} 
-              onClick={() => !disabled ? this.setState({ isClockwise: false }) : null} 
-            />
-            <div className={styles.clockwiseButton} 
-              style={{ backgroundColor: isClockwise ? '#9747FF' : '#111219' }} 
-              onClick={() => !disabled ? this.setState({ isClockwise: true }) : null} 
-            />
-          </div>
-    }
+          {!onlyShowSpeedometer && (
+            <div className={styles.rotationControl}>
+              <div
+                className={styles.counterClockwiseButton}
+                style={{ backgroundColor: !isClockwise ? '#9747FF' : '#111219' }}
+                onClick={() => (!disabled ? this.setState({ isClockwise: false }, () => this.updateValue(0)) : null)}
+              />
+              <div
+                className={styles.clockwiseButton}
+                style={{ backgroundColor: isClockwise ? '#9747FF' : '#111219' }}
+                onClick={() => (!disabled ? this.setState({ isClockwise: true }, () => this.updateValue(0)) : null)}
+              />
+            </div>
+          )
+          }
           <div className={styles.speedometer}>
             <div className={styles.speedLabel}>
               <div className={styles.currentSpeedValue}>{currentValue}</div>
@@ -95,59 +108,65 @@ class Speedometer extends PureComponent {
             </div>
             {lines}
           </div>
-          {!onlyShowSpeedometer && <div className={styles.startStopButton} 
-          onClick={!disabled ? () => {
-                this.setState({isRunning: !isRunning}, () => {
-                  isRunning ? onStart(currentValue) : onStop() 
-                }) 
-          } : null }>
-            <img src={isRunning ? stopIcon : playArrowIcon} className={styles.startStopButtonIcon} />
-            <div className={styles.startStopButtonText} style={{ color: isRunning ? '#DE0050' : '#36A900'}}>{isRunning ? 'Stop' : 'Start'}</div>
-          </div>
-    }
-          {!onlyShowSpeedometer && <div className={styles.numberPicker}>
-            <Repeatable
-              disabled={disabled}
-              repeatDelay={500}
-              repeatInterval={Math.floor(1000 / 15)}
-              onHold={() => this.updateValue(-step)}
-              onRelease={() => this.updateValue(-step)}
+          {!onlyShowSpeedometer && (
+            <div
+              className={styles.startStopButton}
+              onClick={!disabled ? () => {
+                this.setState({ isRunning: !isRunning }, () => {
+                  isRunning ? onStop() : onStart(currentValue);
+                });
+              } : null}
             >
-              <button
-                type="button"
-                onClick={() => this.updateValue(-step)}
+              <img src={isRunning ? stopIcon : playArrowIcon} className={styles.startStopButtonIcon} alt="start-stop" />
+              <div className={styles.startStopButtonText} style={{ color: isRunning ? '#DE0050' : '#36A900' }}>{isRunning ? 'Stop' : 'Start'}</div>
+            </div>
+          )
+          }
+          {!onlyShowSpeedometer && (
+            <div className={styles.numberPicker}>
+              <Repeatable
                 disabled={disabled}
-                className={styles.numberPickerButton}
+                repeatDelay={500}
+                repeatInterval={Math.floor(1000 / 15)}
+                onHold={() => this.updateValue(-step)}
+                onRelease={() => this.updateValue(-step)}
               >
+                <button
+                  type="button"
+                  onClick={() => this.updateValue(-step)}
+                  disabled={disabled}
+                  className={styles.numberPickerButton}
+                >
               -
-              </button>
-            </Repeatable>
-            <input
-              type="number"
-              className={styles.numberInput}
-              value={currentValue}
-              min={min}
-              max={max}
-              readOnly
-            />
-            <Repeatable
-              disabled={disabled}
-              repeatDelay={500}
-              repeatInterval={Math.floor(1000 / 15)}
-              onHold={() => this.updateValue(step)}
-              onRelease={() => this.updateValue(step)}
-            >
-              <button
-                type="button"
+                </button>
+              </Repeatable>
+              <input
+                type="number"
+                className={styles.numberInput}
+                value={currentValue}
+                min={min}
+                max={max}
+                readOnly
+              />
+              <Repeatable
                 disabled={disabled}
-                onClick={() => this.updateValue(step)}
-                className={styles.numberPickerButton}
+                repeatDelay={500}
+                repeatInterval={Math.floor(1000 / 15)}
+                onHold={() => this.updateValue(step)}
+                onRelease={() => this.updateValue(step)}
               >
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => this.updateValue(step)}
+                  className={styles.numberPickerButton}
+                >
               +
-              </button>
-            </Repeatable>
-          </div>
-    }
+                </button>
+              </Repeatable>
+            </div>
+          )
+          }
         </div>
       );
     }

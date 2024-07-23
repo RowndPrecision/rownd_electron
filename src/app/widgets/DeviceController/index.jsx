@@ -11,8 +11,8 @@ import { LASER_DEVICE_MODE,
   GRBL,
   GRBL_ACTIVE_STATE_IDLE,
   GRBL_ACTIVE_STATE_HOLD,
-  WORKFLOW_STATE_RUNNING, 
-  FOUR_AXIS_DEVICE_MODE} from '../../constants';
+  WORKFLOW_STATE_RUNNING,
+  FOUR_AXIS_DEVICE_MODE } from '../../constants';
 import SliderInput from '../components/SliderInput';
 
 class DeviceController extends PureComponent {
@@ -39,8 +39,10 @@ class DeviceController extends PureComponent {
         }));
       },
       'controller:state': (type, state) => {
+        const { spindle } = state.status;
         if (type === GRBL) {
           this.setState({
+            spindleSpeed: spindle,
             controller: {
               type: type,
               state: state,
@@ -119,9 +121,25 @@ class DeviceController extends PureComponent {
       return true;
     }
 
-    handleSpindleSpeedChange(value) {
+    handleSpindleSpeedChange(value, isClockwise, isRunning) {
       const spindleSpeed = Number(value) || 0;
-      this.setState({ spindleSpeed: spindleSpeed });
+
+      if (isRunning) {
+        espController.command('gcode', isClockwise ? 'M3 S' + spindleSpeed : 'M4 S' + spindleSpeed);
+      } else {
+        this.setState({ spindleSpeed: spindleSpeed });
+      }
+    }
+
+    handleLaserSliderInput(value) {
+      if (value > 0) {
+        const power = value * 10;
+        const duration = 0;
+        const maxS = 1000;
+        espController.command('lasertest:on', power, duration, maxS);
+      } else {
+        espController.command('lasertest:off');
+      }
     }
 
     render() {
@@ -134,24 +152,31 @@ class DeviceController extends PureComponent {
       return (
         <div className={styles.deviceControllerWidget}>
           {
-            (deviceMode === LASER_DEVICE_MODE) ? 
-            <SliderInput min={0} max={100} cur={0} disabled={!state.canClick} onChange={(value) => console.log(value)} />
-            : 
-            <Speedometer
-            min={0}
-            max={(deviceMode === FOUR_AXIS_DEVICE_MODE) ? 12000 : 3000}
-            step={10}
-            unitName={'RPM'}
-            disabled={!state.canClick}
-            onStart={(isClockwise) =>  espController.command('gcode', isClockwise ? 'M3 S' + state.spindleSpeed : 'M4 S' + state.spindleSpeed)}
-            onStop={() => espController.command('gcode', 'M5')}
-            onChange={(value) => {
-              if (!state.canClick) {
-                return;
-              }
-              this.handleSpindleSpeedChange(value);
-            }}
-          />
+            (deviceMode === LASER_DEVICE_MODE)
+              ? (
+                <SliderInput
+                  min={0} max={100} cur={0}
+                  disabled={!state.canClick} onChange={(value) => this.handleLaserSliderInput(value)}
+                />
+              )
+              : (
+                <Speedometer
+                  min={0}
+                  max={(deviceMode === FOUR_AXIS_DEVICE_MODE) ? 12000 : 3000}
+                  cur={state.spindleSpeed}
+                  step={10}
+                  unitName="RPM"
+                  disabled={!state.canClick}
+                  onStart={(isClockwise) => espController.command('gcode', isClockwise ? 'M3 S' + state.spindleSpeed : 'M4 S' + state.spindleSpeed)}
+                  onStop={() => espController.command('gcode', 'M5')}
+                  onChange={(value, isClockwise, isRunning) => {
+                    if (!state.canClick) {
+                      return;
+                    }
+                    this.handleSpindleSpeedChange(value, isClockwise, isRunning);
+                  }}
+                />
+              )
           }
           <JogController deviceMode={deviceMode} />
         </div>
