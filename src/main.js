@@ -47,7 +47,7 @@ function getBrowserWindowOptions() {
   const defaultOptions = {
     show: false,
     fullscreen: true,
-    kiosk: true,
+    kiosk: false,
     title: `${pkg.name} ${pkg.version}`,
 
     // useContentSize boolean (optional) - The width and height would be used as web page's size, which means the actual window's size will include window frame's size and be slightly larger. Default is false.
@@ -201,14 +201,23 @@ const showMainWindow = async () => {
     return result.filePaths;
   });
 
-  ipcMain.handle('run-python-script', (event) => {
+  ipcMain.handle('run-wireless-controller-script', (event) => {
     const command = 'blueman-manager';
     exec(command, (err, stdout, stderr) => {
       if (err) {
         console.error('An error occurred', err);
         return;
       }
-      console.log(stdout);
+    });
+  });
+
+  ipcMain.handle('run-screen-keyboard-script', (event) => {
+    const command = 'matchbox-keyboard; wmctrl -r "Keyboard" -b add,above';
+    exec(command, (err, stdout, stderr) => {
+      if (err) {
+        console.log('An error occurred', err);
+        return;
+      }
     });
   });
 

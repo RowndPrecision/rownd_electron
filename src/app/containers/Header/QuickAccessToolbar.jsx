@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
+import isElectron from 'is-electron';
 import Space from 'app/components/Space';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
@@ -35,6 +36,12 @@ class QuickAccessToolbar extends PureComponent {
       },
       'console': () => {
         this.setState(prevState => ({ isPopupOpen: !prevState.isPopupOpen }));
+      },
+      'keyboard': async () => {
+        if (isElectron()) {
+          const { ipcRenderer } = window.require('electron');
+          await ipcRenderer.invoke('run-screen-keyboard-script');
+        }
       },
     };
 
@@ -94,6 +101,18 @@ class QuickAccessToolbar extends PureComponent {
                 <i className="fa fa-terminal" />
                 <Space width="8" />
                 {i18n._('Console')}
+              </button>
+            </li>
+            <li className="btn-group btn-group-sm" role="group">
+              <button
+                type="button"
+                className="btn btn-default"
+                onClick={this.command.keyboard}
+                title={i18n._('Screen Keyboard')}
+              >
+                <i className="fa fa-keyboard" />
+                <Space width="8" />
+                {i18n._('Screen Keyboard')}
               </button>
             </li>
           </ul>

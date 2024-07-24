@@ -436,7 +436,7 @@ class DeviceConnections extends PureComponent {
             onTapAction={async () => {
               if (isElectron()) {
                 const { ipcRenderer } = window.require('electron');
-                await ipcRenderer.invoke('run-python-script');
+                await ipcRenderer.invoke('run-wireless-controller-script');
               }
             }}
           />

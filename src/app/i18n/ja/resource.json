@@ -353,5 +353,6 @@
     "Use RTS/CTS flow control": "RTS/CTSフロー制御を使用する",
     "PWM": "4 AXIS",
     "ASDACN1": "LATHE",
-    "LASER": "LASER"
+    "LASER": "LASER",
+    "Screen Keyboard": ""
 }
