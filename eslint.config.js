@@ -1,7 +1,9 @@
 const path = require('path');
 
 module.exports = {
-  parser: 'babel-eslint',
+  languageOptions: {
+    parser: 'babel-eslint',
+  },
   env: {
     browser: true,
     node: true
