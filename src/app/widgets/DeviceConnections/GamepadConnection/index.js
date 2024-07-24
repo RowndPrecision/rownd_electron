@@ -44,7 +44,6 @@ class GamepadConnection extends EventEmitter {
     buttons.forEach((button, index) => {
       const prevValue = this.buttons[index];
       if ((button.value !== prevValue) && (button.pressed || button.value !== 0)) {
-        console.log(`Button ${index} changed to`, button.value);
         if (index === 6) {
           espController.command('gcode', 'M3 S' + button.value * 1000 * 3);
         }

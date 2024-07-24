@@ -127,7 +127,7 @@ class Speedometer extends PureComponent {
               <Repeatable
                 disabled={disabled}
                 repeatDelay={500}
-                repeatInterval={Math.floor(1000 / 15)}
+                repeatInterval={Math.floor(1000 / 30)}
                 onHold={() => this.updateValue(-step)}
                 onRelease={() => this.updateValue(-step)}
               >
@@ -151,7 +151,7 @@ class Speedometer extends PureComponent {
               <Repeatable
                 disabled={disabled}
                 repeatDelay={500}
-                repeatInterval={Math.floor(1000 / 15)}
+                repeatInterval={Math.floor(1000 / 30)}
                 onHold={() => this.updateValue(step)}
                 onRelease={() => this.updateValue(step)}
               >
