@@ -1,7 +1,6 @@
 const path = require('path');
 
 module.exports = {
-  extends: 'trendmicro',
   parser: 'babel-eslint',
   env: {
     browser: true,
