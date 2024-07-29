@@ -1,22 +1,16 @@
-import classNames from 'classnames';
-import React, { PureComponent } from 'react';
-import { Nav, Navbar, NavDropdown, MenuItem, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { withRouter } from 'react-router-dom';
-import semver from 'semver';
-import without from 'lodash/without';
-import Push from 'push.js';
 import api from 'app/api';
 import Anchor from 'app/components/Anchor';
-import Space from 'app/components/Space';
 import settings from 'app/config/settings';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
-import log from 'app/lib/log';
-import * as user from 'app/lib/user';
-import store from 'app/store';
+import without from 'lodash/without';
+import Push from 'push.js';
+import React, { PureComponent } from 'react';
+import { Navbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { withRouter } from 'react-router-dom';
+import semver from 'semver';
 import QuickAccessToolbar from './QuickAccessToolbar';
-import styles from './index.styl';
 
 const releases = 'https://github.com/cncjs/cncjs/releases';
 
@@ -248,14 +242,10 @@ class Header extends PureComponent {
     }
 
     render() {
-      const { history, location } = this.props;
-      const { pushPermission, commands, runningTasks, currentVersion, latestVersion } = this.state;
+      const { location } = this.props;
+      const { currentVersion, latestVersion } = this.state;
       const newUpdateAvailable = semver.lt(currentVersion, latestVersion);
       const tooltip = newUpdateAvailable ? newUpdateAvailableTooltip() : <div />;
-      const sessionEnabled = store.get('session.enabled');
-      const signedInName = store.get('session.name');
-      const hideUserDropdown = !sessionEnabled;
-      const showCommands = commands.length > 0;
 
       return (
         <Navbar
@@ -279,7 +269,7 @@ class Header extends PureComponent {
                 style={{
                   padding: 0,
                   position: 'relative',
-                  height: 50,
+                  height: 40,
                   width: 60
                 }}
                 href={releases}
@@ -293,170 +283,13 @@ class Header extends PureComponent {
                   src="images/logo-badge-2x.png"
                   alt=""
                 />
-                {/* <div
-                  style={{
-                    fontSize: '50%',
-                    lineHeight: '14px',
-                    textAlign: 'center',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {settings.version}
-                </div> */}
-                {/* {newUpdateAvailable && (
-                  <span
-                    className="label label-primary"
-                    style={{
-                      fontSize: '50%',
-                      position: 'absolute',
-                      top: 2,
-                      right: 2
-                    }}
-                  >
-                                N
-                  </span>
-                )} */}
               </Anchor>
             </OverlayTrigger>
             <Navbar.Toggle />
           </Navbar.Header>
-          <Navbar.Collapse>
-            <Nav pullRight>
-              <NavDropdown
-                className={classNames(
-                  { 'hidden': hideUserDropdown }
-                )}
-                id="nav-dropdown-user"
-                title={(
-                  <div title={i18n._('My Account')}>
-                    <i className="fa fa-fw fa-user" />
-                  </div>
-                )}
-                noCaret
-              >
-                <MenuItem header>
-                  {i18n._('Signed in as {{name}}', { name: signedInName })}
-                </MenuItem>
-                <MenuItem divider />
-                <MenuItem
-                  href="#/settings/user-accounts"
-                >
-                  <i className="fa fa-fw fa-user" />
-                  <Space width="8" />
-                  {i18n._('Account')}
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    if (user.isAuthenticated()) {
-                      log.debug('Destroy and cleanup the WebSocket connection');
-                      controller.disconnect();
-
-                      user.signout();
-
-                      // Remember current location
-                      history.replace(location.pathname);
-                    }
-                  }}
-                >
-                  <i className="fa fa-fw fa-sign-out" />
-                  <Space width="8" />
-                  {i18n._('Sign Out')}
-                </MenuItem>
-              </NavDropdown>
-              <NavDropdown
-                id="nav-dropdown-menu"
-                title={(
-                  <div title={i18n._('Options')}>
-                    <i className="fa fa-fw fa-ellipsis-v" />
-                    {this.state.runningTasks.length > 0 && (
-                      <span
-                        className="label label-primary"
-                        style={{
-                          position: 'absolute',
-                          top: 4,
-                          right: 4
-                        }}
-                      >
-                                        N
-                      </span>
-                    )}
-                  </div>
-                )}
-                noCaret
-              >
-                {showCommands && (
-                  <MenuItem header>
-                    {i18n._('Command')}
-                    {pushPermission === Push.Permission.GRANTED && (
-                      <span className="pull-right">
-                        <i className="fa fa-fw fa-bell-o" />
-                      </span>
-                    )}
-                    {pushPermission === Push.Permission.DENIED && (
-                      <span className="pull-right">
-                        <i className="fa fa-fw fa-bell-slash-o" />
-                      </span>
-                    )}
-                    {pushPermission === Push.Permission.DEFAULT && (
-                      <span className="pull-right">
-                        <Anchor
-                          className={styles.btnIcon}
-                          onClick={this.actions.requestPushPermission}
-                          title={i18n._('Show notifications')}
-                        >
-                          <i className="fa fa-fw fa-bell" />
-                        </Anchor>
-                      </span>
-                    )}
-                  </MenuItem>
-                )}
-                {showCommands && commands.map((cmd) => {
-                  const isTaskRunning = runningTasks.indexOf(cmd.taskId) >= 0;
-
-                  return (
-                    <MenuItem
-                      key={cmd.id}
-                      disabled={cmd.disabled}
-                      onSelect={() => {
-                        this.actions.runCommand(cmd);
-                      }}
-                    >
-                      <span title={cmd.command}>{cmd.title || cmd.command}</span>
-                      <span className="pull-right">
-                        <i
-                          className={classNames(
-                            'fa',
-                            'fa-fw',
-                            { 'fa-circle-o-notch': isTaskRunning },
-                            { 'fa-spin': isTaskRunning },
-                            { 'fa-exclamation-circle': cmd.err },
-                            { 'text-error': cmd.err }
-                          )}
-                          title={cmd.err}
-                        />
-                      </span>
-                    </MenuItem>
-                  );
-                })}
-                {showCommands &&
-                  <MenuItem divider />
-                }
-                <MenuItem
-                  href="https://github.com/cncjs/cncjs/wiki"
-                  target="_blank"
-                >
-                  {i18n._('Help')}
-                </MenuItem>
-                <MenuItem
-                  href="https://github.com/cncjs/cncjs/issues"
-                  target="_blank"
-                >
-                  {i18n._('Report an issue')}
-                </MenuItem>
-              </NavDropdown>
-            </Nav>
+          <Navbar.Collapse style={{ background: '#222222' }}>
             {location.pathname === '/workspace' &&
-              <QuickAccessToolbar state={this.state} actions={this.actions} />
+            <QuickAccessToolbar state={this.state} actions={this.actions} />
             }
           </Navbar.Collapse>
         </Navbar>

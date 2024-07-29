@@ -24,6 +24,7 @@ import {
 } from './electron-app/menu-template';
 import launchServer from './server-cli';
 import pkg from './package.json';
+import { espUpload } from './update-esp/espUpload';
 
 let mainWindow = null;
 let powerId = 0;
@@ -46,8 +47,8 @@ mkdirp.sync(userDataPath);
 function getBrowserWindowOptions() {
   const defaultOptions = {
     show: false,
-    fullscreen: true,
-    kiosk: true,
+    fullscreen: false,
+    kiosk: false,
     title: `${pkg.name} ${pkg.version}`,
 
     // useContentSize boolean (optional) - The width and height would be used as web page's size, which means the actual window's size will include window frame's size and be slightly larger. Default is false.
@@ -221,6 +222,16 @@ const showMainWindow = async () => {
     });
   });
 
+  ipcMain.handle('check-updates-for-esp', (event, data) => {
+    espUpload(data.port, data.baudrate, pkg.espVersion).then(() => {
+      console.log('ESP Upload process completed');
+    }).catch(error => {
+      console.error('Error during upload process:', error);
+    }).finally(() => {
+      mainWindow.webContents.send('finish-esp-update');
+    });
+  });
+
   autoUpdater.checkForUpdatesAndNotify();
 };
 
@@ -247,6 +258,7 @@ autoUpdater.on('update-downloaded', (info) => {
   dialog.showMessageBox(dialogOpts).then((returnValue) => {
     if (returnValue.response === 0) {
       autoUpdater.quitAndInstall();
+      mainWindow.webContents.send('show-loading', true);
     }
   });
 });

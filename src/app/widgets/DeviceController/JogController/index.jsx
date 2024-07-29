@@ -258,7 +258,7 @@ class JogController extends PureComponent {
 
       return (
         <div className={styles.jogControllerContainer}>
-          <div style={{ display: 'flex', gap: '30px' }}>
+          <div style={{ display: 'flex', gap: '10px' }}>
             <div className={styles.jogController}>
               <Repeatable
                 disabled={!canClickXZ}

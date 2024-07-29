@@ -19,6 +19,7 @@ import { GRBL,
   GRBL_ACTIVE_STATE_ALARM,
   GRBL_ACTIVE_STATE_CHECK } from 'app/constants';
 import io from 'socket.io-client';
+import FacebookLoading from 'react-facebook-loading';
 import styles from './index.styl';
 import ConnectedDevice from './ConnectedDevice';
 import GamepadConnection from './GamepadConnection';
@@ -41,32 +42,35 @@ class DeviceConnections extends PureComponent {
 
     espControllerEvents = {
       'serialport:list': (ports) => {
-        log.debug('Received a list of serial ports:', ports);
+        const { espPortManufacturer, espBaudrate, computerPortManufacturer } = this.state;
 
-        this.stopLoading();
+        log.debug('Received a list of serial ports:', ports);
 
         this.setState(state => ({
           ports: ports,
         }));
 
-        ports.forEach((port) => {
-          const { espPortManufacturer, espBaudrate, computerPortManufacturer } = this.state;
+        ports.forEach(async (port) => {
           if (port.manufacturer === espPortManufacturer) {
-            this.setState(state => ({
-              alertMessage: '',
-              espPort: port,
-            }));
+            if (isElectron()) {
+              const { ipcRenderer } = window.require('electron');
+              await ipcRenderer.invoke('check-updates-for-esp', port);
 
-            this.espOpenPort(port, {
-              baudrate: espBaudrate
-            });
+              this.setState(state => ({
+                alertMessage: 'ESP is updating!. Please wait.'
+              }));
 
-            return;
-          } else {
-            this.setState(state => ({
-              alertMessage: 'Rownd port not found', // TODO: Localization
-              espPort: null
-            }));
+              ipcRenderer.removeAllListeners('finish-esp-update');
+              ipcRenderer.on('finish-esp-update', (event, message) => {
+                this.espOpenPort(port, {
+                  baudrate: espBaudrate
+                });
+              });
+            } else {
+              this.espOpenPort(port, {
+                baudrate: espBaudrate
+              });
+            }
           }
 
           if (port.manufacturer === computerPortManufacturer) {
@@ -75,6 +79,14 @@ class DeviceConnections extends PureComponent {
             }));
           }
         });
+
+        const hasEspPortManufacturer = ports.some(port => port.manufacturer === espPortManufacturer);
+        if (!hasEspPortManufacturer) {
+          this.setState(state => ({
+            alertMessage: 'Rownd port not found', // TODO: Localization
+            espPort: null,
+          }));
+        }
       },
       'serialport:change': (options) => {
         log.debug('serialport:change', options); // TODO: Port Değişikliği
@@ -156,6 +168,15 @@ class DeviceConnections extends PureComponent {
           gamepadConnected: false
         }));
       });
+
+      if (isElectron()) {
+        const { ipcRenderer } = window.require('electron');
+        ipcRenderer.on('show-loading', (event, state) => {
+          this.setState(state => ({
+            loading: state
+          }));
+        });
+      }
     }
 
     componentWillUnmount() {
@@ -268,23 +289,12 @@ class DeviceConnections extends PureComponent {
     }
 
     startLoading() {
-      const delay = 5 * 1000; // wait for 5 seconds
-
       this.setState(state => ({
         loading: true
       }));
-      this._loadingTimer = setTimeout(() => {
-        this.setState(state => ({
-          loading: false
-        }));
-      }, delay);
     }
 
     stopLoading() {
-      if (this._loadingTimer) {
-        clearTimeout(this._loadingTimer);
-        this._loadingTimer = null;
-      }
       this.setState(state => ({
         loading: false
       }));
@@ -320,28 +330,31 @@ class DeviceConnections extends PureComponent {
           this.setState(state => ({
             alertMessage: i18n._('Error opening serial port \'{{- port}}\'', { port: port }),
             espConnecting: false,
-            espConnected: false
+            espConnected: false,
+            loading: false
           }));
 
           log.error(err);
           return;
         }
+        this.setState(state => ({
+          alertMessage: '',
+          espPort: port,
+          loading: false
+        }));
       });
     }
 
-    espClosePort(port = this.state.espPort) {
+    espClosePort() {
       this.setState(state => ({
         espConnecting: false,
         espConnected: false
       }));
-      espController.closePort(port, (err) => {
+      espController.closePort(this.state.espPort.port, (err) => {
         if (err) {
           log.error(err);
           return;
         }
-
-        // Refresh ports
-        espController.listPorts();
       });
     }
 
@@ -383,7 +396,7 @@ class DeviceConnections extends PureComponent {
     }
 
     render() {
-      const { espConnected, alertMessage, computerConnected, phoneBLEConnected, gamepadConnected } = this.state;
+      const { espConnected, alertMessage, computerConnected, phoneBLEConnected, gamepadConnected, loading } = this.state;
       const activeState = _.get(this.state.espController.state, 'status.activeState');
 
       const grblStateText = {
@@ -410,50 +423,65 @@ class DeviceConnections extends PureComponent {
               {alertMessage}
             </ToastNotification>
           )}
-          <ConnectedDevice
-            className={styles.connectedDevice}
-            deviceName={`ESP (${this.state.espController.type}) - ${grblStateText}`}
-            isConnected={espConnected}
-            isManualConnectable
-            onTapAction={() => {
-              this.espRefreshPorts();
-            }}
-          />
-          <ConnectedDevice
-            className={styles.connectedDevice}
-            deviceName="Phone"
-            isConnected={phoneBLEConnected}
-            infoText="*For connect to phone please use your phone"
-            isManualConnectable={false}
-            onTapAction={() => {}}
-          />
-          <ConnectedDevice
-            className={styles.connectedDevice}
-            deviceName="Gamepad"
-            isConnected={gamepadConnected}
-            infoText="*For connect to phone please use your gamepad"
-            isManualConnectable={true}
-            onTapAction={async () => {
-              if (isElectron()) {
-                const { ipcRenderer } = window.require('electron');
-                await ipcRenderer.invoke('run-wireless-controller-script');
-              }
-            }}
-          />
-          <ConnectedDevice
-            className={styles.connectedDevice}
-            deviceName="Computer"
-            isConnected={computerConnected}
-            infoText="*For connect to computer please use your computer"
-            isManualConnectable={true}
-            onTapAction={() => {
-              if (this.state.computerConnected) {
-                this.closeComputerConnection();
-              } else {
-                this.openComputerConnection();
-              }
-            }}
-          />
+          {
+            loading && (
+              <FacebookLoading
+                delay={400}
+                zoom={2}
+                style={{ margin: '20px auto' }}
+              />
+            )
+          }
+          {
+            !loading && (
+              <React.Fragment>
+                <ConnectedDevice
+                  className={styles.connectedDevice}
+                  deviceName={`ESP (${this.state.espController.type}) - ${grblStateText}`}
+                  isConnected={espConnected}
+                  isManualConnectable
+                  onTapAction={() => {
+                    this.espRefreshPorts();
+                  }}
+                />
+                <ConnectedDevice
+                  className={styles.connectedDevice}
+                  deviceName="Phone"
+                  isConnected={phoneBLEConnected}
+                  infoText="*For connect to phone please use your phone"
+                  isManualConnectable={false}
+                  onTapAction={() => {}}
+                />
+                <ConnectedDevice
+                  className={styles.connectedDevice}
+                  deviceName="Gamepad"
+                  isConnected={gamepadConnected}
+                  infoText="*For connect to phone please use your gamepad"
+                  isManualConnectable={true}
+                  onTapAction={async () => {
+                    if (isElectron()) {
+                      const { ipcRenderer } = window.require('electron');
+                      await ipcRenderer.invoke('run-wireless-controller-script');
+                    }
+                  }}
+                />
+                <ConnectedDevice
+                  className={styles.connectedDevice}
+                  deviceName="Computer"
+                  isConnected={computerConnected}
+                  infoText="*For connect to computer please use your computer"
+                  isManualConnectable={true}
+                  onTapAction={() => {
+                    if (this.state.computerConnected) {
+                      this.closeComputerConnection();
+                    } else {
+                      this.openComputerConnection();
+                    }
+                  }}
+                />
+              </React.Fragment>
+            )
+          }
         </div>
       );
     }

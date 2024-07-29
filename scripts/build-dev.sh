@@ -14,6 +14,7 @@ cross-env NODE_ENV=development babel "*.js" \
 cross-env NODE_ENV=development babel "electron-app/**/*.js" \
     --config-file ../babel.config.js \
     --out-dir ../output/cncjs/electron-app
+
 popd
 
 babel -d output/cncjs/server src/server
@@ -27,3 +28,4 @@ mkdir -p output/cncjs/server
 
 cp -af src/app/{favicon.ico,i18n,images,assets} output/cncjs/app/
 cp -af src/server/{i18n,views} output/cncjs/server/
+cp -af src/update-esp dist/cncjs

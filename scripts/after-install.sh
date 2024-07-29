@@ -1,4 +1,4 @@
-# #!/bin/bash
+#!/bin/bash
 
 sudo setcap cap_net_admin,cap_net_raw+eip /opt/Rownd/rownd-app
 sudo chmod 4755 /opt/Rownd/chrome-sandbox
@@ -9,3 +9,7 @@ sudo ldconfig
 
 sudo mkdir -p /opt/Rownd/resources/app/server/services/phonebleconnection/files
 sudo chown -R rownd /opt/Rownd/resources/app/server/services/phonebleconnection/files
+
+python3 -m venv venv
+source venv/bin/activate
+pip install esptool
