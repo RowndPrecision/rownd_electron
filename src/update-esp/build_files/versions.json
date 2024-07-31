@@ -25,7 +25,7 @@
       "offset_firmware": "0x10000"
     },
     {
-      "version": "v1.2..0",
+      "version": "v1.2.0",
       "toolVersion": "latest",
       "build_date": "2024-08-01",
       "description": "Major feature update",
