@@ -167,9 +167,7 @@ class SerialConnection extends EventEmitter {
         return;
       }
 
-      if (data.trim() !== '$G' || data.trim() !== '?') {
-        console.log('COMMAND: ', data);
-      }
+      console.log('COMMAND: ', data);
 
       data = this.writeFilter(data, context);
 
