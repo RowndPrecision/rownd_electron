@@ -10,6 +10,9 @@ sudo ldconfig
 sudo mkdir -p /opt/Rownd/resources/app/server/services/phonebleconnection/files
 sudo chown -R rownd /opt/Rownd/resources/app/server/services/phonebleconnection/files
 
+sudo chmod 664 /opt/Rownd/resources/app/update-esp/build_files/versions.json
+sudo chown -R rownd /opt/Rownd/resources/app/update-esp/build_files/versions.json
+
 python3 -m venv venv
 source venv/bin/activate
 pip install esptool
