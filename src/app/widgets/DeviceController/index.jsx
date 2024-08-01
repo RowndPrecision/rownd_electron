@@ -124,11 +124,13 @@ class DeviceController extends PureComponent {
     handleSpindleSpeedChange(value, isClockwise, isRunning) {
       const spindleSpeed = Number(value) || 0;
 
-      if (isRunning) {
-        espController.command('gcode', isClockwise ? 'M3 S' + spindleSpeed : 'M4 S' + spindleSpeed);
-      } else {
-        this.setState({ spindleSpeed: spindleSpeed });
-      }
+      this.setState({ spindleSpeed: spindleSpeed }, () => {
+        if (value === 0) {
+          espController.command('gcode', 'M5');
+        } else if (isRunning) {
+          espController.command('gcode', isClockwise ? 'M3 S' + spindleSpeed : 'M4 S' + spindleSpeed);
+        }
+      });
     }
 
     handleLaserSliderInput(value) {
@@ -167,12 +169,9 @@ class DeviceController extends PureComponent {
                   step={10}
                   unitName="RPM"
                   disabled={!state.canClick}
-                  onStart={(isClockwise) => espController.command('gcode', isClockwise ? 'M3 S' + state.spindleSpeed : 'M4 S' + state.spindleSpeed)}
-                  onStop={() => espController.command('gcode', 'M5')}
+                  onStart={(isClockwise) => this.handleSpindleSpeedChange(state.spindleSpeed, isClockwise, true)}
+                  onStop={() => this.handleSpindleSpeedChange(0, false, false)}
                   onChange={(value, isClockwise, isRunning) => {
-                    if (!state.canClick) {
-                      return;
-                    }
                     this.handleSpindleSpeedChange(value, isClockwise, isRunning);
                   }}
                 />

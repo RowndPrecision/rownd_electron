@@ -198,6 +198,7 @@ class DeviceAxes extends PureComponent {
               name="X"
               machinePosition={mposXAsix}
               workPosition={wposXAsix}
+              onClick={() => espController.command('gcode', 'G10L20P1X0')}
             />
             { (deviceMode === FOUR_AXIS_DEVICE_MODE || deviceMode === LASER_DEVICE_MODE) &&
             (
@@ -205,12 +206,14 @@ class DeviceAxes extends PureComponent {
                 name="C"
                 machinePosition={mposCAsix}
                 workPosition={wposCAsix}
+                onClick={() => espController.command('gcode', 'G10L20P1C0')}
               />
             ) }
             <DeviceAxePositon
               name="Z"
               machinePosition={mposZAsix}
               workPosition={wposZAxis}
+              onClick={() => espController.command('gcode', 'G10L20P1Z0')}
             />
           </div>
 

@@ -2,8 +2,6 @@
     border-radius: 8px;
     border: 0.2px solid #99A5FF;
     display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 40px;
     padding: 10px 20px;
     margin-left: 20px;
     margin-right: 20px;
@@ -32,7 +30,7 @@
     float: left;
     display: flex;
     align-items: center;
-    margin-left: 20px;
+    margin-bottom: 10px;
 }
 
  .runFilePath {
@@ -52,5 +50,7 @@
     letter-spacing: 0.6px;
     text-align: left;
     overflow: hidden;
-    overflow-wrap: anywhere;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    direction: rtl;
 }

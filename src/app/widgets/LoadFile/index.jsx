@@ -15,7 +15,6 @@ import includes from 'lodash/includes';
 import pubsub from 'pubsub-js';
 import Notifications from './Notifications';
 import styles from './index.styl';
-import LinearProgressBar from '../components/LinearProgressBar';
 import loadIcon from './images/load-icon.svg';
 import RowndButton from '../components/RowndButton';
 import {
@@ -675,10 +674,6 @@ class LoadFile extends PureComponent {
           {isReady && (
             <div className={styles.loadFileReady}>
               <span className={styles.runFilePath}>{gcode.name}</span>
-              <LinearProgressBar
-                value={gcode.sent}
-                max={gcode.total}
-              />
             </div>
           )}
           {gcode.loading &&

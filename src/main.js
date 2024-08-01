@@ -50,6 +50,7 @@ function getBrowserWindowOptions() {
     fullscreen: false,
     kiosk: false,
     title: `${pkg.name} ${pkg.version}`,
+    autoHideMenuBar: true,
 
     // useContentSize boolean (optional) - The width and height would be used as web page's size, which means the actual window's size will include window frame's size and be slightly larger. Default is false.
     useContentSize: true,

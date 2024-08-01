@@ -256,7 +256,7 @@ class Header extends PureComponent {
             border: 'none',
             margin: 0,
             backgroundColor: '#000',
-            height: '60px'
+            height: '40px'
           }}
         >
           <Navbar.Header>

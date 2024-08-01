@@ -74,9 +74,7 @@ class Speedometer extends PureComponent {
       const { currentValue, isRunning, isClockwise } = this.state;
       const newValue = Math.min(Math.max(currentValue + offset, min), max);
 
-      this.setState({ currentValue: newValue }, () => {
-        onChange(newValue, isClockwise, isRunning);
-      });
+      onChange(newValue, isClockwise, isRunning);
     }
 
     render() {
@@ -113,7 +111,7 @@ class Speedometer extends PureComponent {
               className={styles.startStopButton}
               onClick={!disabled ? () => {
                 this.setState({ isRunning: !isRunning }, () => {
-                  isRunning ? onStop() : onStart(currentValue);
+                  isRunning ? onStop() : onStart(isClockwise);
                 });
               } : null}
             >
@@ -128,12 +126,11 @@ class Speedometer extends PureComponent {
                 disabled={disabled}
                 repeatDelay={500}
                 repeatInterval={Math.floor(1000 / 30)}
+                onPress={() => this.updateValue(-step)}
                 onHold={() => this.updateValue(-step)}
-                onRelease={() => this.updateValue(-step)}
               >
                 <button
                   type="button"
-                  onClick={() => this.updateValue(-step)}
                   disabled={disabled}
                   className={styles.numberPickerButton}
                 >
@@ -153,12 +150,11 @@ class Speedometer extends PureComponent {
                 repeatDelay={500}
                 repeatInterval={Math.floor(1000 / 30)}
                 onHold={() => this.updateValue(step)}
-                onRelease={() => this.updateValue(step)}
+                onPress={() => this.updateValue(step)}
               >
                 <button
                   type="button"
                   disabled={disabled}
-                  onClick={() => this.updateValue(step)}
                   className={styles.numberPickerButton}
                 >
               +
