@@ -166,7 +166,7 @@ class DeviceController extends PureComponent {
                   min={0}
                   max={(deviceMode === FOUR_AXIS_DEVICE_MODE) ? 12000 : 3000}
                   cur={state.spindleSpeed}
-                  step={10}
+                  step={(deviceMode === FOUR_AXIS_DEVICE_MODE) ? 500 : 10}
                   unitName="RPM"
                   disabled={!state.canClick}
                   onStart={(isClockwise) => this.handleSpindleSpeedChange(state.spindleSpeed, isClockwise, true)}
