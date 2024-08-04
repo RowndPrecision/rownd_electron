@@ -119,13 +119,19 @@ class Workspace extends PureComponent {
           let match = data.split('=');
           if (match && match[1]) {
             let value = match[1].trim();
-            this.setState({ selectedDeviceMode: value });
+            this.setState({ selectedDeviceMode: value.toUpperCase() });
           }
         }
       },
       'serialport:open': (options) => {
         const { port } = options;
         this.setState({ port: port });
+
+        setTimeout(() => {
+          // Device Initial Current Mode
+          controller.command('gcode', '$37=' + LATHE_DEVICE_MODE);
+          controller.command('gcode', '$37');
+        }, 1000);
       },
       'serialport:close': (options) => {
         this.setState({ port: '' });
@@ -237,13 +243,6 @@ class Workspace extends PureComponent {
         // A workaround solution to trigger componentDidUpdate on initial render
         this.setState({ mounted: true });
       }, 0);
-
-
-      setTimeout(() => {
-        // Device Current Mode
-        controller.command('gcode', '$37=' + LATHE_DEVICE_MODE);
-        controller.command('gcode', '$37');
-      }, 500);
     }
 
     componentWillUnmount() {
@@ -353,9 +352,7 @@ class Workspace extends PureComponent {
                   <DeviceModeSelection
                     modes={DEVICE_MODES}
                     selectedDeviceMode={selectedDeviceMode}
-                    onChange={(mode) => this.setState(state => ({
-                      selectedDeviceMode: mode
-                    }), () => controller.command('gcode', '$37=' + mode))
+                    onChange={(mode) => controller.command('gcode', '$37=' + mode)
                     }
                   />
                   <DeviceAxes deviceMode={selectedDeviceMode} />

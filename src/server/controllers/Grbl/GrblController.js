@@ -4,10 +4,10 @@ import {
 } from 'ensure-type';
 import * as parser from 'gcode-parser';
 import _ from 'lodash';
-import SerialConnection from '../../lib/SerialConnection';
 import EventTrigger from '../../lib/EventTrigger';
 import Feeder from '../../lib/Feeder';
 import Sender, { SP_TYPE_CHAR_COUNTING } from '../../lib/Sender';
+import SerialConnection from '../../lib/SerialConnection';
 import Workflow, {
   WORKFLOW_STATE_IDLE,
   WORKFLOW_STATE_PAUSED,
@@ -30,11 +30,11 @@ import {
 import GrblRunner from './GrblRunner';
 import {
   GRBL,
-  GRBL_ACTIVE_STATE_RUN,
   GRBL_ACTIVE_STATE_HOLD,
-  GRBL_REALTIME_COMMANDS,
+  GRBL_ACTIVE_STATE_RUN,
   GRBL_ALARMS,
   GRBL_ERRORS,
+  GRBL_REALTIME_COMMANDS,
   GRBL_SETTINGS
 } from './constants';
 
@@ -256,7 +256,7 @@ class GrblController {
           return;
         }
 
-        if (this.runner.isAlarm()) {
+        if (this.runner.isAlarm() && !line.includes('$37')) {
           this.feeder.reset();
           log.warn('Stopped sending G-code commands in Alarm mode');
           return;
