@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react';
 import color from 'cli-color';
 import controller from 'app/lib/controller';
 import settings from 'app/config/settings';
-import i18n from 'app/lib/i18n';
+// import i18n from 'app/lib/i18n';
 import Console from './Console';
 //import cx from 'classnames';
 //import styles from './index.styl';
@@ -32,14 +32,8 @@ class DeviceConsole extends PureComponent {
 
       controllerEvents = {
         'serialport:open': (options) => {
-          const { port, baudrate } = options;
+          const { port } = options;
           this.setState({ port: port });
-
-          if (this.terminal) {
-            const { productName, version } = settings;
-            this.terminal.writeln(color.white.bold(`${productName} ${version} [${controller.type}]`));
-            this.terminal.writeln(color.white(i18n._('Connected to {{-port}} with a baud rate of {{baudrate}}', { port: color.yellowBright(port), baudrate: color.blueBright(baudrate) })));
-          }
         },
         'serialport:close': (options) => {
           this.actions.clearAll();
@@ -80,6 +74,12 @@ class DeviceConsole extends PureComponent {
 
       componentDidMount() {
         this.addControllerEvents();
+
+        if (this.terminal) {
+          const { productName, version } = settings;
+          this.terminal.writeln(color.white.bold(`${productName} ${version} [${controller.type}]`));
+          // this.terminal.writeln(color.white(i18n._('Connected to {{-port}} with a baud rate of {{baudrate}}', { port: color.yellowBright(port), baudrate: color.blueBright(baudrate) })));
+        }
       }
 
       componentWillUnmount() {

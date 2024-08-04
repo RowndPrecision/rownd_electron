@@ -352,7 +352,10 @@ class Workspace extends PureComponent {
                   <DeviceModeSelection
                     modes={DEVICE_MODES}
                     selectedDeviceMode={selectedDeviceMode}
-                    onChange={(mode) => controller.command('gcode', '$37=' + mode)
+                    onChange={(mode) => {
+                      controller.command('gcode', '$37=' + mode);
+                      controller.command('gcode', '$37');
+                    }
                     }
                   />
                   <DeviceAxes deviceMode={selectedDeviceMode} />
