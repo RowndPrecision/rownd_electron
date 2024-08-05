@@ -6,6 +6,7 @@ import styles from './index.styl';
 
 class DeviceAxePositon extends PureComponent {
     static propTypes = {
+      label: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       machinePosition: PropTypes.string,
       workPosition: PropTypes.string,
@@ -13,12 +14,12 @@ class DeviceAxePositon extends PureComponent {
     };
 
     render() {
-      const { name, machinePosition, workPosition, onClick } = this.props;
+      const { name, machinePosition, workPosition, onClick, label } = this.props;
 
       return (
         <div className={styles.deviceAxe} onClick={onClick}>
           <div className={styles.axeLabel}>
-            <span>ZERO <br /><br /> {name}</span>
+            <span>{label} <br /><br /> {name}</span>
           </div>
           <div className={styles.positions}>
             <div className={styles.workPosition}>

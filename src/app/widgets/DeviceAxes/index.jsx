@@ -195,6 +195,7 @@ class DeviceAxes extends PureComponent {
         <div className={styles.deviceAxesWidget}>
           <div className={styles.axePositions}>
             <DeviceAxePositon
+              label="ZERO"
               name="X"
               machinePosition={mposXAsix}
               workPosition={wposXAsix}
@@ -203,6 +204,7 @@ class DeviceAxes extends PureComponent {
             { (deviceMode === FOUR_AXIS_DEVICE_MODE || deviceMode === LASER_DEVICE_MODE) &&
             (
               <DeviceAxePositon
+                label="ZERO"
                 name="C"
                 machinePosition={mposCAsix}
                 workPosition={wposCAsix}
@@ -210,6 +212,7 @@ class DeviceAxes extends PureComponent {
               />
             ) }
             <DeviceAxePositon
+              label="ZERO"
               name="Z"
               machinePosition={mposZAsix}
               workPosition={wposZAxis}

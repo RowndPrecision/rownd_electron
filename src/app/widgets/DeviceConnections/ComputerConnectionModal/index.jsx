@@ -141,16 +141,19 @@ class ComputerConnectionModal extends PureComponent {
               <div className={styles.computerConnectedModalContentAxePositions}>
                 <DeviceAxePositon
                   name="X"
+                  label="POS"
                   machinePosition={mposXAsix}
                   workPosition={wposXAsix}
                 />
                 <DeviceAxePositon
                   name="C"
+                  label="POS"
                   machinePosition={mposCAsix}
                   workPosition={wposCAsix}
                 />
                 <DeviceAxePositon
                   name="Z"
+                  label="POS"
                   machinePosition={mposZAsix}
                   workPosition={wposZAxis}
                 />
