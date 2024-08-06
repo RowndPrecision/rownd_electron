@@ -96,11 +96,6 @@ class DeviceConnections extends PureComponent {
         log.debug('serialport:open', options);
         const { controllerType, port, baudrate, controllerState } = options;
 
-        if (!this.state.espConnected) {
-          this.connectPhoneBLEConnectionSocket();
-          this.connectComputerConnectionSocket();
-        }
-
         this.setState(state => ({
           alertMessage: '',
           espConnecting: false,
@@ -112,7 +107,10 @@ class DeviceConnections extends PureComponent {
           },
           espPort: options,
           espBaudrate: baudrate,
-        }));
+        }), () => {
+          this.connectPhoneBLEConnectionSocket();
+          this.connectComputerConnectionSocket();
+        });
 
         log.debug(`Established a connection to the serial port "${port}"`);
       },
@@ -254,7 +252,7 @@ class DeviceConnections extends PureComponent {
       this.phoneBLEConnectionSocket.on('connect', () => {
         log.debug('Socket.IO Phone BLE sunucusuna bağlantı kuruldu.');
 
-        const espPort = this.state.ports[0];
+        const espPort = this.state.espPort;
 
         this.phoneBLEConnectionSocket.emit('open', espPort, () => {
           log.debug('open', JSON.stringify(espPort));
