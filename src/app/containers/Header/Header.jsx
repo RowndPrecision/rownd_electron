@@ -5,12 +5,14 @@ import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import without from 'lodash/without';
+import isElectron from 'is-electron';
 import Push from 'push.js';
 import React, { PureComponent } from 'react';
 import { Navbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 import semver from 'semver';
 import QuickAccessToolbar from './QuickAccessToolbar';
+import Progress from '../../components/Progress';
 
 const releases = 'https://github.com/cncjs/cncjs/releases';
 
@@ -189,7 +191,13 @@ class Header extends PureComponent {
         commands: [],
         runningTasks: [],
         currentVersion: settings.version,
-        latestVersion: settings.version
+        latestVersion: settings.version,
+        update: {
+          available: false,
+          downloaded: false,
+          downloadProgress: null,
+          error: null
+        }
       };
     }
 
@@ -202,6 +210,10 @@ class Header extends PureComponent {
       // Initial actions
       this.actions.checkForUpdates();
       this.actions.fetchCommands();
+
+      if (isElectron()) {
+        this.listenElectronUpdateCallbacks();
+      }
     }
 
     componentWillUnmount() {
@@ -241,9 +253,51 @@ class Header extends PureComponent {
       });
     }
 
+    listenElectronUpdateCallbacks() {
+      const { ipcRenderer } = window.require('electron');
+      console.log('dinlemedeyim');
+
+      ipcRenderer.on('update-available', (event, info) => {
+        console.log('update-available');
+        this.setState(state => ({
+          update: {
+            ...state.update,
+            available: true,
+          },
+        }));
+      });
+      ipcRenderer.on('update-downloaded', (event, info) => {
+        console.log('downloaded');
+        this.setState(state => ({
+          update: {
+            ...state.update,
+            downloaded: true,
+          },
+        }));
+      });
+      ipcRenderer.on('download-progress', (event, progressObj) => {
+        console.log('progress');
+        this.setState(state => ({
+          update: {
+            ...state.update,
+            downloadProgress: progressObj,
+          },
+        }));
+      });
+      ipcRenderer.on('update-error', (event, err) => {
+        console.log('error');
+        this.setState(state => ({
+          update: {
+            ...state.update,
+            error: err,
+          },
+        }));
+      });
+    }
+
     render() {
       const { location } = this.props;
-      const { currentVersion, latestVersion } = this.state;
+      const { currentVersion, latestVersion, update } = this.state;
       const newUpdateAvailable = semver.lt(currentVersion, latestVersion);
       const tooltip = newUpdateAvailable ? newUpdateAvailableTooltip() : <div />;
 
@@ -276,13 +330,20 @@ class Header extends PureComponent {
                 target="_blank"
                 title={`${settings.productName} ${settings.version}`}
               >
-                <img
-                  style={{
-                    margin: '10px 16px 8px'
-                  }}
-                  src="images/logo-badge-2x.png"
-                  alt=""
-                />
+                <div style={{ display: 'grid', gridTemplateColumns: 'auto auto' }}>
+                  <img
+                    style={{
+                      margin: '10px 16px 8px'
+                    }}
+                    src="images/logo-badge-2x.png"
+                    alt=""
+                  />
+                  <div style={{ color: 'white', fontSize: '10px', marginTop: '4px', width: '240px' }}>
+                    { update.available && <p>Update Available & {Math.floor(update.downloadProgress.percent) < 100 ? 'Downloading..' : 'Downloaded.'}</p> }
+                    { update.error && <p>Update Error</p> }
+                    { update.downloadProgress && <p style={{ marginTop: '-8px' }}><Progress min={0} max={100} now={Math.floor(update.downloadProgress.percent)} /></p> }
+                  </div>
+                </div>
               </Anchor>
             </OverlayTrigger>
             <Navbar.Toggle />

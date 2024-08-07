@@ -233,7 +233,9 @@ const showMainWindow = async () => {
     });
   });
 
-  autoUpdater.checkForUpdatesAndNotify();
+  setTimeout(() => {
+    autoUpdater.checkForUpdatesAndNotify();
+  }, 5000);
 };
 
 // Auto Update
@@ -245,10 +247,12 @@ autoUpdater.logger.transports.file.level = 'info';
 
 autoUpdater.on('update-available', (info) => {
   log.info('Update available:', info);
+  mainWindow.webContents.send('update-available', info);
 });
 
 autoUpdater.on('update-downloaded', (info) => {
   log.info('Update downloaded:', info);
+  mainWindow.webContents.send('update-downloaded', info);
   const dialogOpts = {
     type: 'info',
     buttons: ['Restart', 'Later'],
@@ -265,6 +269,7 @@ autoUpdater.on('update-downloaded', (info) => {
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
+  mainWindow.webContents.send('download-progress', progressObj);
   let message = 'Download speed: ' + progressObj.bytesPerSecond;
   message = message + ' - Downloaded ' + progressObj.percent + '%';
   message = message + ' (' + progressObj.transferred + '/' + progressObj.total + ')';
@@ -272,6 +277,7 @@ autoUpdater.on('download-progress', (progressObj) => {
 });
 
 autoUpdater.on('error', (err) => {
+  mainWindow.webContents.send('update-error', err);
   console.log('Error in auto-updater:', err);
 });
 

@@ -158,7 +158,7 @@ class FilePreviewModal extends PureComponent {
               {lines.length > 0 && (
                 <VirtualList
                   width="100%"
-                  height={Math.min((lines.length * 20) > 800 ? (lines.length * 20) - 300 : (lines.length * 20), 800)}
+                  height={Math.min((lines.length * 20) > 500 ? 500 : (lines.length * 20), 500)}
                   style={{
                     color: 'white'
                   }}
