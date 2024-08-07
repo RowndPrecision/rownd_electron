@@ -39,6 +39,7 @@ import {
 } from './constants';
 import Loading from './Loading';
 import FileProcessingModal from './FileProcessingModal';
+import FilePreviewModal from './FilePreviewModal';
 
 const translateExpression = (function() {
   const { Parser } = ExpressionEvaluator;
@@ -104,7 +105,6 @@ class LoadFile extends PureComponent {
           gcode: {
             ...state.gcode,
             loading: true,
-            rendering: false,
             ready: false
           }
         }));
@@ -115,7 +115,6 @@ class LoadFile extends PureComponent {
               gcode: {
                 ...state.gcode,
                 loading: false,
-                rendering: false,
                 ready: false
               }
             }));
@@ -128,29 +127,12 @@ class LoadFile extends PureComponent {
         });
       },
       loadGCode: (name, gcode) => {
-        const capable = {
-          view3D: !!this.visualizer
-        };
-
         const updater = (state) => ({
           gcode: {
             ...state.gcode,
             loading: false,
-            rendering: capable.view3D,
-            ready: !capable.view3D,
-            content: gcode,
-            bbox: {
-              min: {
-                x: 0,
-                y: 0,
-                z: 0
-              },
-              max: {
-                x: 0,
-                y: 0,
-                z: 0
-              }
-            }
+            ready: true,
+            content: gcode
           }
         });
         const callback = () => {
@@ -164,47 +146,11 @@ class LoadFile extends PureComponent {
             zmin: 0,
             zmax: 0
           };
-
-          // if (!capable.view3D) {
-          //   return;
-          // }
-
-          setTimeout(() => {
-            this.visualizer.load(name, gcode, ({ bbox }) => {
-              // Set gcode bounding box
-              controller.context = {
-                ...controller.context,
-                xmin: bbox.min.x,
-                xmax: bbox.max.x,
-                ymin: bbox.min.y,
-                ymax: bbox.max.y,
-                zmin: bbox.min.z,
-                zmax: bbox.max.z
-              };
-
-              pubsub.publish('gcode:bbox', bbox);
-
-              this.setState((state) => ({
-                gcode: {
-                  ...state.gcode,
-                  loading: false,
-                  rendering: false,
-                  ready: true,
-                  bbox: bbox
-                }
-              }));
-            });
-          }, 0);
         };
 
         this.setState(updater, callback);
       },
       unloadGCode: () => {
-        const visualizer = this.visualizer;
-        if (visualizer) {
-          visualizer.unload();
-        }
-
         // Clear gcode bounding box
         controller.context = {
           ...controller.context,
@@ -220,21 +166,8 @@ class LoadFile extends PureComponent {
           gcode: {
             ...state.gcode,
             loading: false,
-            rendering: false,
             ready: false,
             content: '',
-            bbox: {
-              min: {
-                x: 0,
-                y: 0,
-                z: 0
-              },
-              max: {
-                x: 0,
-                y: 0,
-                z: 0
-              }
-            }
           }
         }));
       },
@@ -292,6 +225,18 @@ class LoadFile extends PureComponent {
       openGCodeStatsWidgetModal: () => {
         portal(({ onClose }) => (
           <FileProcessingModal onClose={onClose} deviceMode={this.props.deviceMode} />
+        ));
+      },
+      openGCodePreviewModal: () => {
+        portal(({ onClose }) => (
+          <FilePreviewModal
+            onClose={(isRunnable) => {
+              onClose();
+              isRunnable && this.actions.handleRun();
+            }}
+            deviceMode={this.props.deviceMode}
+            gcodeContent={this.state.gcode.content}
+          />
         ));
       },
       handlePause: () => {
@@ -426,10 +371,6 @@ class LoadFile extends PureComponent {
 
     pubsubTokens = [];
 
-    widgetContent = null;
-
-    visualizer = null;
-
     componentDidMount() {
       this.addControllerEvents();
     }
@@ -470,21 +411,8 @@ class LoadFile extends PureComponent {
         },
         gcode: {
           loading: false,
-          rendering: false,
           ready: false,
           content: '',
-          bbox: {
-            min: {
-              x: 0,
-              y: 0,
-              z: 0
-            },
-            max: {
-              x: 0,
-              y: 0,
-              z: 0
-            }
-          },
           // Updates by the "sender:status" event
           name: '',
           size: 0,
@@ -637,7 +565,6 @@ class LoadFile extends PureComponent {
     render() {
       const { gcode, notification, port, workflow } = this.state;
 
-      //const showLoader = gcode.loading || gcode.rendering;
       const showNotifications = !!notification.type;
       const canClick = !!port;
       const isReady = canClick && gcode.ready;
@@ -719,6 +646,14 @@ class LoadFile extends PureComponent {
                 title={i18n._('Close')}
                 onClick={this.actions.handleClose}
                 disabled={!canClose}
+              />
+            )}
+            { canRun && (
+              <RowndButton
+                type="secondary"
+                title="Preview"
+                onClick={this.actions.openGCodePreviewModal}
+                disabled={!canRun}
               />
             )}
           </div>

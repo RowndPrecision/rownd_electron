@@ -52,7 +52,7 @@ class GrblLineParserResultStatus {
 
     // Machine Position (v0.9, v1.1)
     if (_.has(result, 'MPos')) {
-      const axes = ['x', 'y', 'z', 'a', 'b', 'c'];
+      const axes = ['x', 'c', 'z', 'a', 'b', 'y'];
       const mPos = _.get(result, 'MPos', ['0.000', '0.000', '0.000']); // Defaults to [x, y, z]
       payload.mpos = {};
       for (let i = 0; i < mPos.length; ++i) {
@@ -62,7 +62,7 @@ class GrblLineParserResultStatus {
 
     // Work Position (v0.9, v1.1)
     if (_.has(result, 'WPos')) {
-      const axes = ['x', 'y', 'z', 'a', 'b', 'c'];
+      const axes = ['x', 'c', 'z', 'a', 'b', 'y'];
       const wPos = _.get(result, 'WPos', ['0.000', '0.000', '0.000']); // Defaults to [x, y, z]
       payload.wpos = {};
       for (let i = 0; i < wPos.length; ++i) {
@@ -72,7 +72,7 @@ class GrblLineParserResultStatus {
 
     // Work Coordinate Offset (v1.1)
     if (_.has(result, 'WCO')) {
-      const axes = ['x', 'y', 'z', 'a', 'b', 'c'];
+      const axes = ['x', 'c', 'z', 'a', 'b', 'y'];
       const wco = _.get(result, 'WCO', ['0.000', '0.000', '0.000']); // Defaults to [x, y, z]
       payload.wco = {};
       for (let i = 0; i < wco.length; ++i) {

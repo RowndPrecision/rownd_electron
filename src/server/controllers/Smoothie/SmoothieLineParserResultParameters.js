@@ -15,7 +15,7 @@ class SmoothieLineParserResultParameters {
     // [G59:0.0000] or [G59.1:0.0000]
     const re = /^G\d+(\.\d+)?$/i;
     if (re.test(name)) {
-      const axes = ['x', 'y', 'z', 'a', 'b', 'c'];
+      const axes = ['x', 'c', 'z', 'a', 'b', 'y'];
       const list = value.split(',');
       payload.value = {};
       for (let i = 0; i < list.length; ++i) {
@@ -30,7 +30,7 @@ class SmoothieLineParserResultParameters {
 
     // [PRB:0.0000,0.0000,0.0000:0]
     if (name === 'PRB') {
-      const axes = ['x', 'y', 'z', 'a', 'b', 'c'];
+      const axes = ['x', 'c', 'z', 'a', 'b', 'y'];
       const [str, result] = value.split(':');
       const list = str.split(',');
       payload.value = {};

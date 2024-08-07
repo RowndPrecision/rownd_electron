@@ -1,0 +1,54 @@
+.filePreviewModal {
+    padding-left: 20px;
+    border: 0.5px solid #08F7FE;
+    background: #111219;
+    border-radius: 8px;
+    margin: -4px;
+
+    &Header {
+        background: rgba(8, 247, 254, 0.20);
+        display: flex;
+        align-items: center;
+        margin: 0 -20px;
+        height: 60px;
+        justify-content: center;
+
+      &Icon {
+        width: 28px;
+        height: 28px;
+    }
+  
+        &Text {
+            margin-left: 8px;
+            color: #08F7FE;
+            font-family: "PT Sans";
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 14px;
+            letter-spacing: 0.7px;
+            text-transform: capitalize;
+        }
+    }  
+     &Content {
+        display: grid;
+    } 
+
+    &Footer {
+        margin: 20px;
+
+        &Actions {
+            width: 100%;
+            margin-top: 20px;
+
+            &WorkflowControlButtons {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                justify-content: center;
+                padding-right: 20px; 
+            }
+
+        }
+    }
+}

@@ -15,7 +15,7 @@ class GrblLineParserResultParameters {
     // [Gxx:0.000]
     const re = /^G\d+$/i;
     if (re.test(name)) {
-      const axes = ['x', 'y', 'z', 'a', 'b', 'c'];
+      const axes = ['x', 'c', 'z', 'a', 'b', 'y'];
       const list = value.split(',');
       payload.value = {};
       for (let i = 0; i < list.length; ++i) {
@@ -30,7 +30,7 @@ class GrblLineParserResultParameters {
 
     // [PRB:0.000,0.000,1.492:1]
     if (name === 'PRB') {
-      const axes = ['x', 'y', 'z', 'a', 'b', 'c'];
+      const axes = ['x', 'c', 'z', 'a', 'b', 'y'];
       const [str, result] = value.split(':');
       const list = str.split(',');
       payload.value = {};

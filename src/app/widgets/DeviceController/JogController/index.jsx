@@ -282,10 +282,10 @@ class JogController extends PureComponent {
                 disabled={!canClickXZ}
                 repeatDelay={1000}
                 repeatInterval={state.feedRate}
-                onHold={() => {
-                  const distance = this.getJogDistance();
-                  this.jog({ X: distance, Z: -distance });
-                }}
+                // onHold={() => {
+                //   const distance = this.getJogDistance();
+                //   this.jog({ X: distance, Z: -distance });
+                // }}
                 onPress={() => {
                   const distance = this.getJogDistance();
                   this.jog({ X: distance, Z: -distance });
@@ -305,10 +305,10 @@ class JogController extends PureComponent {
                 disabled={!canClickZ}
                 repeatDelay={1000}
                 repeatInterval={state.feedRate}
-                onHold={() => {
-                  const distance = this.getJogDistance();
-                  this.jog({ X: distance });
-                }}
+                // onHold={() => {
+                //   const distance = this.getJogDistance();
+                //   this.jog({ X: distance });
+                // }}
                 onPress={() => {
                   const distance = this.getJogDistance();
                   this.jog({ X: distance });
@@ -328,10 +328,10 @@ class JogController extends PureComponent {
                 disabled={!canClickXZ}
                 repeatDelay={1000}
                 repeatInterval={state.feedRate}
-                onHold={() => {
-                  const distance = this.getJogDistance();
-                  this.jog({ X: distance, Z: distance });
-                }}
+                // onHold={() => {
+                //   const distance = this.getJogDistance();
+                //   this.jog({ X: distance, Z: distance });
+                // }}
                 onPress={() => {
                   const distance = this.getJogDistance();
                   this.jog({ X: distance, Z: distance });
@@ -351,10 +351,10 @@ class JogController extends PureComponent {
                 disabled={!canClickX}
                 repeatDelay={1000}
                 repeatInterval={state.feedRate}
-                onHold={() => {
-                  const distance = this.getJogDistance();
-                  this.jog({ Z: -distance });
-                }}
+                // onHold={() => {
+                //   const distance = this.getJogDistance();
+                //   this.jog({ Z: -distance });
+                // }}
                 onPress={() => {
                   const distance = this.getJogDistance();
                   this.jog({ Z: -distance });
@@ -383,10 +383,10 @@ class JogController extends PureComponent {
                 disabled={!canClickX}
                 repeatDelay={1000}
                 repeatInterval={state.feedRate}
-                onHold={() => {
-                  const distance = this.getJogDistance();
-                  this.jog({ Z: distance });
-                }}
+                // onHold={() => {
+                //   const distance = this.getJogDistance();
+                //   this.jog({ Z: distance });
+                // }}
                 onPress={() => {
                   const distance = this.getJogDistance();
                   this.jog({ Z: distance });
@@ -406,10 +406,10 @@ class JogController extends PureComponent {
                 disabled={!canClickXZ}
                 repeatDelay={1000}
                 repeatInterval={state.feedRate}
-                onHold={() => {
-                  const distance = this.getJogDistance();
-                  this.jog({ X: -distance, Z: -distance });
-                }}
+                // onHold={() => {
+                //   const distance = this.getJogDistance();
+                //   this.jog({ X: -distance, Z: -distance });
+                // }}
                 onPress={() => {
                   const distance = this.getJogDistance();
                   this.jog({ X: -distance, Z: -distance });
@@ -429,10 +429,10 @@ class JogController extends PureComponent {
                 disabled={!canClickZ}
                 repeatDelay={1000}
                 repeatInterval={state.feedRate}
-                onHold={() => {
-                  const distance = this.getJogDistance();
-                  this.jog({ X: -distance });
-                }}
+                // onHold={() => {
+                //   const distance = this.getJogDistance();
+                //   this.jog({ X: -distance });
+                // }}
                 onPress={() => {
                   const distance = this.getJogDistance();
                   this.jog({ X: -distance });
@@ -452,10 +452,10 @@ class JogController extends PureComponent {
                 disabled={!canClickXZ}
                 repeatDelay={1000}
                 repeatInterval={state.feedRate}
-                onHold={() => {
-                  const distance = this.getJogDistance();
-                  this.jog({ X: -distance, Z: distance });
-                }}
+                // onHold={() => {
+                //   const distance = this.getJogDistance();
+                //   this.jog({ X: -distance, Z: distance });
+                // }}
                 onPress={() => {
                   const distance = this.getJogDistance();
                   this.jog({ X: -distance, Z: distance });
@@ -478,10 +478,10 @@ class JogController extends PureComponent {
                   disabled={!canClickC}
                   repeatDelay={1000}
                   repeatInterval={state.feedRate}
-                  onHold={() => {
-                    const distance = this.getJogDistance();
-                    this.jog({ C: distance });
-                  }}
+                  // onHold={() => {
+                  //   const distance = this.getJogDistance();
+                  //   this.jog({ C: distance });
+                  // }}
                   onPress={() => {
                     const distance = this.getJogDistance();
                     this.jog({ C: distance });
@@ -501,10 +501,10 @@ class JogController extends PureComponent {
                   disabled={!canClickC}
                   repeatDelay={1000}
                   repeatInterval={state.feedRate}
-                  onHold={() => {
-                    const distance = this.getJogDistance();
-                    this.jog({ C: -distance });
-                  }}
+                  // onHold={() => {
+                  //   const distance = this.getJogDistance();
+                  //   this.jog({ C: -distance });
+                  // }}
                   onPress={() => {
                     const distance = this.getJogDistance();
                     this.jog({ C: -distance });
