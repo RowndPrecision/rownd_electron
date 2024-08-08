@@ -339,7 +339,7 @@ class Header extends PureComponent {
                     alt=""
                   />
                   <div style={{ color: 'white', fontSize: '10px', marginTop: '4px', width: '240px' }}>
-                    { update.available && <p>Update Available & {Math.floor(update.downloadProgress.percent) < 100 ? 'Downloading..' : 'Downloaded.'}</p> }
+                    { update.available && update.downloadProgress && <p>Update Available & {Math.floor(update.downloadProgress.percent) < 100 ? 'Downloading..' : 'Downloaded.'}</p> }
                     { update.error && <p>Update Error</p> }
                     { update.downloadProgress && <p style={{ marginTop: '-8px' }}><Progress min={0} max={100} now={Math.floor(update.downloadProgress.percent)} /></p> }
                   </div>

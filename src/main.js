@@ -244,6 +244,7 @@ log.transports.console.level = 'info';
 
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
+let isAutoUpdaterProgressContinue = false;
 
 autoUpdater.on('update-available', (info) => {
   log.info('Update available:', info);
@@ -262,6 +263,7 @@ autoUpdater.on('update-downloaded', (info) => {
 
   dialog.showMessageBox(dialogOpts).then((returnValue) => {
     if (returnValue.response === 0) {
+      isAutoUpdaterProgressContinue = false;
       autoUpdater.quitAndInstall();
       mainWindow.webContents.send('show-loading', true);
     }
@@ -269,6 +271,7 @@ autoUpdater.on('update-downloaded', (info) => {
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
+  isAutoUpdaterProgressContinue = true;
   mainWindow.webContents.send('download-progress', progressObj);
   let message = 'Download speed: ' + progressObj.bytesPerSecond;
   message = message + ' - Downloaded ' + progressObj.percent + '%';
@@ -277,13 +280,17 @@ autoUpdater.on('download-progress', (progressObj) => {
 });
 
 autoUpdater.on('error', (err) => {
+  isAutoUpdaterProgressContinue = false;
   mainWindow.webContents.send('update-error', err);
   console.log('Error in auto-updater:', err);
 });
 
 setInterval(() => {
+  if (isAutoUpdaterProgressContinue) {
+    return;
+  }
   autoUpdater.checkForUpdatesAndNotify();
-}, 600000);
+}, 1800000);
 
 // Increase V8 heap size of the main process in production
 if (process.arch === 'x64') {

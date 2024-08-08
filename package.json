@@ -1,7 +1,7 @@
 {
   "name": "rownd-app",
-  "version": "1.0.23",
-  "espVersion": "v1.3.0",
+  "version": "1.0.24",
+  "espVersion": "v1.4.0",
   "description": "The Ultimate CNC Lathe Machine Unleashing Your Creative Journey",
   "homepage": "https://www.rowndcnc.com/",
   "author": "Yakup Ad <yakup@rowndprecision.com>",
