@@ -22,7 +22,7 @@ class StepSizePicker extends PureComponent {
             disabled={!canStepBackward}
             repeatDelay={500}
             repeatInterval={Math.floor(1000 / 15)}
-            onHold={onStepBackward}
+            //onHold={onStepBackward}
             onRelease={onStepBackward}
           >
             <button
@@ -40,7 +40,7 @@ class StepSizePicker extends PureComponent {
             disabled={!canStepForward}
             repeatDelay={500}
             repeatInterval={Math.floor(1000 / 15)}
-            onHold={onStepForward}
+            //onHold={onStepForward}
             onRelease={onStepForward}
           >
             <button

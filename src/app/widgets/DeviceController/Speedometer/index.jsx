@@ -127,7 +127,7 @@ class Speedometer extends PureComponent {
                 repeatDelay={500}
                 repeatInterval={Math.floor(1000 / 30)}
                 onPress={() => this.updateValue(-step)}
-                onHold={() => this.updateValue(-step)}
+                //onHold={() => this.updateValue(-step)}
               >
                 <button
                   type="button"
@@ -149,7 +149,7 @@ class Speedometer extends PureComponent {
                 disabled={disabled}
                 repeatDelay={500}
                 repeatInterval={Math.floor(1000 / 30)}
-                onHold={() => this.updateValue(step)}
+                //onHold={() => this.updateValue(step)}
                 onPress={() => this.updateValue(step)}
               >
                 <button
