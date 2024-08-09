@@ -45,11 +45,17 @@ const userDataPath = app.getPath('userData');
 mkdirp.sync(userDataPath);
 
 function getBrowserWindowOptions() {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+
   const defaultOptions = {
     show: false,
     fullscreen: false,
-    kiosk: false,
+    frame: false,
     title: `${pkg.name} ${pkg.version}`,
+    width: width,
+    height: height,
+    x: 0,
+    y: 0,
     autoHideMenuBar: true,
 
     // useContentSize boolean (optional) - The width and height would be used as web page's size, which means the actual window's size will include window frame's size and be slightly larger. Default is false.
@@ -65,11 +71,11 @@ function getBrowserWindowOptions() {
   };
 
   // { x, y, width, height }
-  const lastOptions = store.get('bounds');
+  // const lastOptions = store.get('bounds');
 
   // Get display that most closely intersects the provided bounds
   let windowOptions = {};
-  if (lastOptions) {
+  /*   if (lastOptions) {
     const display = screen.getDisplayMatching(lastOptions);
 
     if (display.id === lastOptions.id) {
@@ -106,7 +112,7 @@ function getBrowserWindowOptions() {
       y,
       center: true,
     };
-  }
+  } */
 
   return Object.assign({}, defaultOptions, windowOptions);
 }
@@ -128,6 +134,8 @@ const showMainWindow = async () => {
   const inputMenu = Menu.buildFromTemplate(inputMenuTemplate);
   const selectionMenu = Menu.buildFromTemplate(selectionMenuTemplate);
   Menu.setApplicationMenu(applicationMenu);
+
+  mainWindow.setAlwaysOnTop(false);
 
   // https://www.electronjs.org/docs/latest/api/web-contents#contentssetwindowopenhandlerhandler
   // https://github.com/electron/electron/pull/24517
