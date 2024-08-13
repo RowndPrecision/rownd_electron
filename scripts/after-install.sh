@@ -7,8 +7,8 @@ sudo chmod 4755 /opt/Rownd/chrome-sandbox
 echo "/opt/Rownd" | sudo tee /etc/ld.so.conf.d/electron.conf
 sudo ldconfig
 
-sudo mkdir -p /opt/Rownd/resources/app/server/services/phonebleconnection/files
-sudo chown -R rownd /opt/Rownd/resources/app/server/services/phonebleconnection/files
+sudo mkdir -p /opt/Rownd/resources/files
+sudo chown -R rownd /opt/Rownd/resources/files
 
 sudo chmod 664 /opt/Rownd/resources/app/update-esp/build_files/versions.json
 sudo chown -R rownd /opt/Rownd/resources/app/update-esp/build_files/versions.json

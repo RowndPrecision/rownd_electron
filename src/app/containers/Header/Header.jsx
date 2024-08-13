@@ -255,10 +255,8 @@ class Header extends PureComponent {
 
     listenElectronUpdateCallbacks() {
       const { ipcRenderer } = window.require('electron');
-      console.log('dinlemedeyim');
 
       ipcRenderer.on('update-available', (event, info) => {
-        console.log('update-available');
         this.setState(state => ({
           update: {
             ...state.update,
@@ -267,7 +265,6 @@ class Header extends PureComponent {
         }));
       });
       ipcRenderer.on('update-downloaded', (event, info) => {
-        console.log('downloaded');
         this.setState(state => ({
           update: {
             ...state.update,
@@ -276,7 +273,6 @@ class Header extends PureComponent {
         }));
       });
       ipcRenderer.on('download-progress', (event, progressObj) => {
-        console.log('progress');
         this.setState(state => ({
           update: {
             ...state.update,
@@ -285,7 +281,6 @@ class Header extends PureComponent {
         }));
       });
       ipcRenderer.on('update-error', (event, err) => {
-        console.log('error');
         this.setState(state => ({
           update: {
             ...state.update,

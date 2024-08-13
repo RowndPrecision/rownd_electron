@@ -261,14 +261,19 @@ class DeviceAxes extends PureComponent {
               onClick={() => espController.command('homing')}
             />
             <RowndButton
-              title="Sleep"
-              type="primary"
-              onClick={() => espController.command('sleep')}
-            />
-            <RowndButton
               title="Unlock"
               type="primary"
               onClick={() => espController.command('unlock')}
+            />
+            <RowndButton
+              title="Cycle Start"
+              type="primary"
+              onClick={() => espController.command('cyclestart')}
+            />
+            <RowndButton
+              title="Feedhold"
+              type="primary"
+              onClick={() => espController.command('feedhold')}
             />
             <RowndButton
               title="Reset"

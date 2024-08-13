@@ -166,15 +166,6 @@ class DeviceConnections extends PureComponent {
           gamepadConnected: false
         }));
       });
-
-      if (isElectron()) {
-        const { ipcRenderer } = window.require('electron');
-        ipcRenderer.on('show-loading', (event, state) => {
-          this.setState(state => ({
-            loading: state
-          }));
-        });
-      }
     }
 
     componentWillUnmount() {

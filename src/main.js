@@ -208,7 +208,45 @@ const showMainWindow = async () => {
     const result = await dialog.showOpenDialog(mainWindow, {
       properties: ['openFile']
     });
-    return result.filePaths;
+    if (result.filePaths && result.filePaths.length > 0) {
+      mainWindow.webContents.send('show-loading', true);
+
+      const originalFilePath = result.filePaths[0];
+      const fileName = path.basename(originalFilePath);
+      const destinationDir = path.join('/opt/Rownd/resources', 'files');
+      const destinationPath = path.join(destinationDir, fileName);
+
+      // Ensure the destination directory exists
+      if (!fs.existsSync(destinationDir)) {
+        fs.mkdirSync(destinationDir, { recursive: true });
+      }
+
+      // Copy the file to the destination
+      fs.copyFileSync(originalFilePath, destinationPath);
+
+      // Get all files in the directory
+      const files = fs.readdirSync(destinationDir);
+
+      // Sort files by creation time (oldest first)
+      const sortedFiles = files.map(file => ({
+        name: file,
+        time: fs.statSync(path.join(destinationDir, file)).ctime.getTime()
+      })).sort((a, b) => a.time - b.time);
+
+      // If more than 50 files, delete the oldest ones
+      if (sortedFiles.length > 50) {
+        const filesToDelete = sortedFiles.slice(0, sortedFiles.length - 50);
+        filesToDelete.forEach(file => {
+          fs.unlinkSync(path.join(destinationDir, file.name));
+        });
+      }
+
+      mainWindow.webContents.send('show-loading', false);
+
+      return destinationPath;
+    }
+
+    return null;
   });
 
   ipcMain.handle('run-wireless-controller-script', (event) => {
@@ -271,9 +309,9 @@ autoUpdater.on('update-downloaded', (info) => {
 
   dialog.showMessageBox(dialogOpts).then((returnValue) => {
     if (returnValue.response === 0) {
+      mainWindow.webContents.send('show-loading', true);
       isAutoUpdaterProgressContinue = false;
       autoUpdater.quitAndInstall();
-      mainWindow.webContents.send('show-loading', true);
     }
   });
 });

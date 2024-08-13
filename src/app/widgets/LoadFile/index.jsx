@@ -373,6 +373,19 @@ class LoadFile extends PureComponent {
 
     componentDidMount() {
       this.addControllerEvents();
+
+      if (isElectron()) {
+        const { ipcRenderer } = window.require('electron');
+
+        ipcRenderer.on('show-loading', (event, isLoading) => {
+          this.setState(state => ({
+            gcode: {
+              ...state.gcode,
+              loading: isLoading,
+            },
+          }));
+        });
+      }
     }
 
     componentWillUnmount() {
@@ -443,9 +456,9 @@ class LoadFile extends PureComponent {
       // Check whether the code is running in Electron renderer process
       if (isElectron()) {
         const { ipcRenderer } = window.require('electron');
-        const filePaths = await ipcRenderer.invoke('open-file-dialog');
-        if (filePaths.length > 0) {
-          this.readFile(filePaths[0]);
+        const filePath = await ipcRenderer.invoke('open-file-dialog');
+        if (filePath) {
+          this.readFile(filePath);
         }
       } else {
         this.fileInputEl.value = null;

@@ -13,7 +13,7 @@ class WriteCharacteristic extends bleno.Characteristic {
 
     this.fileData = Buffer.alloc(0);
     this.receivedFileName = '';
-    this.filesFolderPath = path.join(__dirname, '..', 'files');
+    this.filesFolderPath = path.join('/opt/Rownd/resources', 'files');
     this.expectedChunks = 0;
     this.receivedChunks = 0;
   }
@@ -69,6 +69,23 @@ class WriteCharacteristic extends bleno.Characteristic {
 
           if (!fs.existsSync(this.filesFolderPath)) {
             fs.mkdirSync(this.filesFolderPath, { recursive: true });
+          }
+
+          // Get all files in the directory
+          const files = fs.readdirSync(this.filesFolderPath);
+
+          // Sort files by creation time (oldest first)
+          const sortedFiles = files.map(file => ({
+            name: file,
+            time: fs.statSync(path.join(this.filesFolderPath, file)).ctime.getTime()
+          })).sort((a, b) => a.time - b.time);
+
+          // If more than 50 files, delete the oldest ones
+          if (sortedFiles.length > 50) {
+            const filesToDelete = sortedFiles.slice(0, sortedFiles.length - 50);
+            filesToDelete.forEach(file => {
+              fs.unlinkSync(path.join(this.filesFolderPath, file.name));
+            });
           }
 
           const savePath = path.join(
