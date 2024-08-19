@@ -19,7 +19,8 @@ class Speedometer extends PureComponent {
       onStop: PropTypes.func,
       disabled: PropTypes.bool,
       step: PropTypes.number,
-      onlyShowSpeedometer: PropTypes.bool
+      onlyShowSpeedometer: PropTypes.bool,
+      deviceMode: PropTypes.string
     };
 
     constructor(props) {
@@ -36,6 +37,13 @@ class Speedometer extends PureComponent {
     componentDidUpdate(prevProps) {
       if (this.props.cur !== prevProps.cur) {
         this.setState({ currentValue: this.props.cur });
+      }
+
+      if (this.props.deviceMode !== prevProps.deviceMode) {
+        this.setState({ isRunning: false }, () => {
+          this.props.onStop(this.state.isClockwise);
+          this.setState({ isClockwise: true });
+        });
       }
     }
 
@@ -111,7 +119,7 @@ class Speedometer extends PureComponent {
               className={styles.startStopButton}
               onClick={!disabled ? () => {
                 this.setState({ isRunning: !isRunning }, () => {
-                  isRunning ? onStop() : onStart(isClockwise);
+                  isRunning ? onStop(isClockwise) : onStart(isClockwise);
                 });
               } : null}
             >
@@ -127,7 +135,7 @@ class Speedometer extends PureComponent {
                 repeatDelay={500}
                 repeatInterval={Math.floor(1000 / 30)}
                 onPress={() => this.updateValue(-step)}
-                //onHold={() => this.updateValue(-step)}
+                onHold={() => this.updateValue(-step)}
               >
                 <button
                   type="button"
@@ -149,7 +157,7 @@ class Speedometer extends PureComponent {
                 disabled={disabled}
                 repeatDelay={500}
                 repeatInterval={Math.floor(1000 / 30)}
-                //onHold={() => this.updateValue(step)}
+                onHold={() => this.updateValue(step)}
                 onPress={() => this.updateValue(step)}
               >
                 <button

@@ -76,7 +76,10 @@ class DeviceController extends PureComponent {
       this.removeControllerEvents();
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(prevProps) {
+      if (prevProps.deviceMode === LASER_DEVICE_MODE && this.props.deviceMode !== prevProps.deviceMode) {
+        espController.command('lasertest:off');
+      }
     }
 
     addControllerEvents() {
@@ -126,7 +129,7 @@ class DeviceController extends PureComponent {
 
       this.setState({ spindleSpeed: spindleSpeed }, () => {
         if (value === 0) {
-          espController.command('gcode', 'M5');
+          espController.command('gcode', 'M5S0');
         } else if (isRunning) {
           espController.command('gcode', isClockwise ? 'M3 S' + spindleSpeed : 'M4 S' + spindleSpeed);
         }
@@ -135,7 +138,7 @@ class DeviceController extends PureComponent {
 
     handleLaserSliderInput(value) {
       if (value > 0) {
-        const power = value * 10;
+        const power = value;
         const duration = 0;
         const maxS = 1000;
         espController.command('lasertest:on', power, duration, maxS);
@@ -163,14 +166,15 @@ class DeviceController extends PureComponent {
               )
               : (
                 <Speedometer
+                  deviceMode={deviceMode}
                   min={0}
                   max={(deviceMode === FOUR_AXIS_DEVICE_MODE) ? 12000 : 3000}
                   cur={state.spindleSpeed}
-                  step={(deviceMode === FOUR_AXIS_DEVICE_MODE) ? 500 : 10}
+                  step={(deviceMode === FOUR_AXIS_DEVICE_MODE) ? 100 : 10}
                   unitName="RPM"
                   disabled={!state.canClick}
                   onStart={(isClockwise) => this.handleSpindleSpeedChange(state.spindleSpeed, isClockwise, true)}
-                  onStop={() => this.handleSpindleSpeedChange(0, false, false)}
+                  onStop={(isClockwise) => this.handleSpindleSpeedChange(0, isClockwise, false)}
                   onChange={(value, isClockwise, isRunning) => {
                     this.handleSpindleSpeedChange(value, isClockwise, isRunning);
                   }}

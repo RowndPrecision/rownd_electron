@@ -69,9 +69,9 @@ class SliderInput extends PureComponent {
               disabled={disabled}
               repeatDelay={500}
               repeatInterval={Math.floor(1000 / 15)}
-              /*               onHold={() => {
+              onHold={() => {
                 this.handleChange(value + 1);
-              }} */
+              }}
               onRelease={() => {
                 this.handleChange(value + 1);
               }}
@@ -91,9 +91,9 @@ class SliderInput extends PureComponent {
               disabled={disabled}
               repeatDelay={500}
               repeatInterval={Math.floor(1000 / 15)}
-              /*               onHold={() => {
+              onHold={() => {
                 this.handleChange(value - 1);
-              }} */
+              }}
               onRelease={() => {
                 this.handleChange(value - 1);
               }}

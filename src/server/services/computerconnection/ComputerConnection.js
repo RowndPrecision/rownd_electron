@@ -1,5 +1,6 @@
 import noop from 'lodash/noop';
 import socketIO from 'socket.io';
+import _ from 'lodash';
 import socketioJwt from 'socketio-jwt';
 import settings from '../../config/settings';
 import logger from '../../lib/logger';
@@ -9,6 +10,7 @@ import {
   authorizeIPAddress,
   validateUser
 } from '../../access-control';
+import { GRBL_REALTIME_COMMANDS } from '../../controllers/Grbl/constants';
 
 const log = logger('service:computerconnection');
 
@@ -48,7 +50,7 @@ class ComputerConnection {
         if (!this.connection) {
           return;
         }
-        const command = String(data).trim();
+        const command = data.trim();
         if (command.length === 0) {
           return;
         }
@@ -57,10 +59,28 @@ class ComputerConnection {
           return;
         }
         console.log('espdata', command);
-        this.connection.write(command + '\n');
+        this.writeln(command);
         this.socket.emit('computer-esp:data', command);
       },
     };
+
+    write(data, context) {
+      // Assertion check
+      if (this.isClose()) {
+        log.error(`Serial port "${this.options.port}" is not accessible`);
+        return;
+      }
+
+      this.connection.write(data);
+    }
+
+    writeln(data, context) {
+      if (_.includes(GRBL_REALTIME_COMMANDS, data)) {
+        this.write(data, context);
+      } else {
+        this.write(data + '\n', context);
+      }
+    }
 
     isOpen() {
       return this.connection && this.connection.isOpen;
