@@ -3,10 +3,12 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Repeatable from 'react-repeatable';
+import espController from 'app/lib/controller';
 import cx from 'classnames';
 import playArrowIcon from './images/play-arrow.svg';
 import stopIcon from './images/stop.svg';
 import styles from './index.styl';
+import { GAMEPAD_BUTTONS } from '../../../constants';
 
 class Speedometer extends PureComponent {
     static propTypes = {
@@ -20,7 +22,7 @@ class Speedometer extends PureComponent {
       disabled: PropTypes.bool,
       step: PropTypes.number,
       onlyShowSpeedometer: PropTypes.bool,
-      deviceMode: PropTypes.string
+      deviceMode: PropTypes.string,
     };
 
     constructor(props) {
@@ -29,9 +31,59 @@ class Speedometer extends PureComponent {
       this.state = {
         currentValue: props.cur || 0,
         isClockwise: true,
-        isRunning: false
       };
       this.totalLines = 100;
+    }
+
+    controllerEvents = {
+      'gamepad:button-action': (buttonName, value) => {
+        switch (buttonName) {
+        case GAMEPAD_BUTTONS.TRIANGLE: {
+          if (!this.props.disabled) {
+            this.setState({ isRunning: true }, () => {
+              this.props.onStart(this.state.isClockwise);
+            });
+          }
+        }
+          break;
+        case GAMEPAD_BUTTONS.CIRCLE:
+          if (!this.props.disabled) {
+            this.setState({ isRunning: false }, () => {
+              this.props.onStop(this.state.isClockwise);
+            });
+          }
+          break;
+        case GAMEPAD_BUTTONS.SPEED_INCREASE:
+          this.updateValue(this.props.step * 10);
+          break;
+        case GAMEPAD_BUTTONS.SPEED_DECREASE:
+          this.updateValue(-this.props.step * 10);
+          break;
+        default: break;
+        }
+      }
+    }
+
+    addControllerEvents() {
+      Object.keys(this.controllerEvents).forEach(eventName => {
+        const callback = this.controllerEvents[eventName];
+        espController.addListener(eventName, callback);
+      });
+    }
+
+    removeControllerEvents() {
+      Object.keys(this.controllerEvents).forEach(eventName => {
+        const callback = this.controllerEvents[eventName];
+        espController.removeListener(eventName, callback);
+      });
+    }
+
+    componentDidMount() {
+      this.addControllerEvents();
+    }
+
+    componentWillUnmount() {
+      this.removeControllerEvents();
     }
 
     componentDidUpdate(prevProps) {
@@ -97,12 +149,12 @@ class Speedometer extends PureComponent {
               <div
                 className={styles.counterClockwiseButton}
                 style={{ backgroundColor: !isClockwise ? '#9747FF' : '#111219' }}
-                onClick={() => (!disabled ? this.setState({ isClockwise: false }, () => this.updateValue(0)) : null)}
+                onClick={() => (!disabled && !isRunning ? this.setState({ isClockwise: false }, () => this.updateValue(0)) : null)}
               />
               <div
                 className={styles.clockwiseButton}
                 style={{ backgroundColor: isClockwise ? '#9747FF' : '#111219' }}
-                onClick={() => (!disabled ? this.setState({ isClockwise: true }, () => this.updateValue(0)) : null)}
+                onClick={() => (!disabled && !isRunning ? this.setState({ isClockwise: true }, () => this.updateValue(0)) : null)}
               />
             </div>
           )

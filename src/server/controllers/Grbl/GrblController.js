@@ -1395,6 +1395,14 @@ class GrblController {
             }, 1000);
           }
         },
+        'gamepad:button-command': () => {
+          const [buttonName, value] = args;
+          this.emit('gamepad:button-action', buttonName, value);
+        },
+        'gamepad:stick-axes-command': () => {
+          const [axes] = args;
+          this.emit('gamepad:stick-axes-action', axes);
+        }
       }[cmd];
 
       if (!handler) {
