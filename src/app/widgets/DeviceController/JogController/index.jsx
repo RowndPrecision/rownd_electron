@@ -23,9 +23,7 @@ import {
   METRIC_STEPS,
   WORKFLOW_STATE_RUNNING,
   LASER_DEVICE_MODE,
-  FOUR_AXIS_DEVICE_MODE,
-  GAMEPAD_BUTTONS,
-  GAMEPAD_STICK_AXES
+  FOUR_AXIS_DEVICE_MODE
 } from '../../../constants';
 
 const FEED_RATES = [10, 25, 50, 100, 150, 200, 300, 400, 500, 750, 1000];
@@ -67,75 +65,6 @@ class JogController extends PureComponent {
             state: controllerState
           },
         }));
-      },
-      'gamepad:button-action': (buttonName, value) => {
-        switch (buttonName) {
-        case GAMEPAD_BUTTONS.FEEDRATE_DECREASE:
-          this.feedRateStepBackward();
-          break;
-        case GAMEPAD_BUTTONS.FEEDRATE_INCREASE:
-          this.feedRateStepForward();
-          break;
-        case GAMEPAD_BUTTONS.MOVE_X_DECREASE: {
-          const distance = this.getJogDistance();
-          this.jog({ X: -distance });
-        }
-          break;
-        case GAMEPAD_BUTTONS.MOVE_X_INCREASE: {
-          const distance = this.getJogDistance();
-          this.jog({ X: distance });
-        }
-          break;
-        case GAMEPAD_BUTTONS.MOVE_Z_DECREASE: {
-          const distance = this.getJogDistance();
-          this.jog({ Z: -distance });
-        }
-          break;
-        case GAMEPAD_BUTTONS.MOVE_Z_INCREASE: {
-          const distance = this.getJogDistance();
-          this.jog({ Z: distance });
-        }
-          break;
-        default: break;
-        }
-      },
-      'gamepad:stick-axes-action': (axes) => {
-        const xAxeValue = axes[GAMEPAD_STICK_AXES.X];
-        const zAxeValue = axes[GAMEPAD_STICK_AXES.Z] * -1;
-        const cAxeValue = axes[GAMEPAD_STICK_AXES.C] * -1;
-        const minThreshold = Math.abs(0.05);
-        const distance = this.getJogDistance();
-        const jogParams = {};
-
-        if (Math.abs(xAxeValue) > minThreshold) {
-          if (xAxeValue > 0) {
-            jogParams.X = distance;
-          } else if (xAxeValue < 0) {
-            jogParams.X = -distance;
-          }
-        }
-
-        if (Math.abs(zAxeValue) > minThreshold) {
-          if (zAxeValue > 0) {
-            jogParams.Z = distance;
-          } else if (zAxeValue < 0) {
-            jogParams.Z = -distance;
-          }
-        }
-
-        if (Math.abs(cAxeValue) > minThreshold &&
-         (this.props.deviceMode === FOUR_AXIS_DEVICE_MODE ||
-          this.props.deviceMode === LASER_DEVICE_MODE)) {
-          if (cAxeValue > 0) {
-            jogParams.C = distance;
-          } else if (cAxeValue < 0) {
-            jogParams.C = -distance;
-          }
-        }
-
-        if (Object.keys(jogParams).length > 0) {
-          this.jog(jogParams);
-        }
       }
     }
 
@@ -276,7 +205,7 @@ class JogController extends PureComponent {
         if (currentIndex > 0) {
           return { feedRate: FEED_RATES[currentIndex - 1] };
         }
-        return null;
+        return null; // Değer aynı kalır
       });
     };
 
@@ -286,7 +215,7 @@ class JogController extends PureComponent {
         if (currentIndex < FEED_RATES.length - 1) {
           return { feedRate: FEED_RATES[currentIndex + 1] };
         }
-        return null;
+        return null; // Değer aynı kalır
       });
     };
 

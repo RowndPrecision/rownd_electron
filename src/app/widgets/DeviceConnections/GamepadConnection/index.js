@@ -1,5 +1,4 @@
 import espController from 'app/lib/controller';
-import { GAMEPAD_BUTTONS, GAMEPAD_STICK_AXES } from '../../../constants';
 
 const EventEmitter = require('events');
 
@@ -37,43 +36,22 @@ class GamepadConnection extends EventEmitter {
   };
 
   handleButtons = (buttons) => {
-    // Initialize or update stored button values
     if (!this.buttons || this.buttons.length !== buttons.length) {
       this.buttons = buttons.map(button => button.value);
       return;
     }
 
-    // Iterate over the buttons and handle changes
     buttons.forEach((button, index) => {
       const prevValue = this.buttons[index];
+      if ((button.value !== prevValue) && (button.pressed || button.value !== 0)) {
+        if (index === 6) {
+          espController.command('gcode', 'M3 S' + button.value * 1000 * 3);
+        }
 
-      // Skip if the button's value hasn't changed or isn't pressed
-      if (!(button.value !== prevValue && (button.pressed || button.value !== 0))) {
-        return;
-      }
-
-      // Define the button command mapping
-      const buttonCommands = {
-        4: GAMEPAD_BUTTONS.FEEDRATE_DECREASE,
-        5: GAMEPAD_BUTTONS.FEEDRATE_INCREASE,
-        14: GAMEPAD_BUTTONS.MOVE_X_DECREASE,
-        15: GAMEPAD_BUTTONS.MOVE_X_INCREASE,
-        12: GAMEPAD_BUTTONS.MOVE_Z_INCREASE,
-        13: GAMEPAD_BUTTONS.MOVE_Z_DECREASE,
-        1: GAMEPAD_BUTTONS.CIRCLE,
-        2: GAMEPAD_BUTTONS.SQUARE,
-        3: GAMEPAD_BUTTONS.TRIANGLE,
-        0: GAMEPAD_BUTTONS.CROSS,
-        6: GAMEPAD_BUTTONS.SPEED_DECREASE,
-        7: GAMEPAD_BUTTONS.SPEED_INCREASE
-      };
-
-      // Get the corresponding button name from the mapping
-      const buttonName = buttonCommands[index];
-
-      // Execute the command if a valid button name was found
-      if (buttonName) {
-        espController.command('gamepad:button-command', buttonName, button.value);
+        if (index === 7) {
+          espController.command('gcode', 'M3');
+          espController.command('gcode', 'M5');
+        }
       }
     });
 
@@ -82,15 +60,54 @@ class GamepadConnection extends EventEmitter {
   };
 
   handleSticks = (axes) => {
-    const cAxe = axes[1];
-    const xAxe = axes[2];
-    const zAxe = axes[3];
+    this.calculateAndSendGCode(axes);
+  };
 
-    espController.command('gamepad:stick-axes-command', {
-      [GAMEPAD_STICK_AXES.X]: xAxe,
-      [GAMEPAD_STICK_AXES.Z]: zAxe,
-      [GAMEPAD_STICK_AXES.C]: cAxe,
-    });
+  calculateAndSendGCode = (axes) => {
+    const now = Date.now();
+    if (now - this.lastCallTime < this.debounceDelay) {
+      // Eğer önceki çağrıdan itibaren yeterli süre geçmediyse fonksiyonu çağırmayın
+      return;
+    }
+
+    this.lastCallTime = now;
+
+    const xValue = axes[1] !== undefined ? axes[1].toFixed(4) * 1000 : null;
+    const cValue = axes[3] !== undefined ? axes[3].toFixed(4) * 1000 : null;
+    const zValue = axes[0] !== undefined ? axes[0].toFixed(4) * 1000 : null;
+
+    const minThreshold = Math.abs(0.05) * 1000; // Eşik değeri sabiti
+
+    let command = '$J=G21G91';
+    let totalFeedRateSquared = 0; // Toplam besleme oranının karesi
+
+    // X ekseni
+    if (xValue !== null && Math.abs(xValue) > minThreshold) {
+      const feedRateX = Math.abs(xValue);
+      totalFeedRateSquared += feedRateX * feedRateX;
+      command += `X${axes[1].toFixed(4) * -1}`;
+    }
+
+    // C ekseni
+    if (cValue !== null && Math.abs(cValue) > minThreshold) {
+      const feedRateC = Math.abs(cValue);
+      totalFeedRateSquared += feedRateC * feedRateC;
+      command += `C${axes[3].toFixed(4) * -1}`;
+    }
+
+    // Z ekseni
+    if (zValue !== null && Math.abs(zValue) > minThreshold) {
+      const feedRateZ = Math.abs(zValue);
+      totalFeedRateSquared += feedRateZ * feedRateZ;
+      command += `Z${axes[0].toFixed(4)}`;
+    }
+
+    const feedRateCurT = Math.sqrt(totalFeedRateSquared);
+    if (feedRateCurT > 0) {
+      command += `F${feedRateCurT}`;
+      console.log(command);
+      espController.command('gcode', command);
+    }
   };
 
   gameLoop = () => {

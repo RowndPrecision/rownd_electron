@@ -13,7 +13,7 @@ import { LASER_DEVICE_MODE,
   GRBL_ACTIVE_STATE_HOLD,
   WORKFLOW_STATE_RUNNING,
   FOUR_AXIS_DEVICE_MODE } from '../../constants';
-import LaserSliderInput from './LaserSliderInput';
+import SliderInput from '../components/SliderInput';
 
 class DeviceController extends PureComponent {
     static propTypes = {
@@ -159,12 +159,9 @@ class DeviceController extends PureComponent {
           {
             (deviceMode === LASER_DEVICE_MODE)
               ? (
-                <LaserSliderInput
-                  min={0}
-                  max={100}
-                  cur={0}
-                  disabled={!state.canClick}
-                  onChange={(value) => this.handleLaserSliderInput(value)}
+                <SliderInput
+                  min={0} max={100} cur={0}
+                  disabled={!state.canClick} onChange={(value) => this.handleLaserSliderInput(value)}
                 />
               )
               : (

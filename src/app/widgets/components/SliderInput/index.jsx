@@ -1,11 +1,9 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Repeatable from 'react-repeatable';
-import espController from 'app/lib/controller';
 import styles from './index.styl';
-import { GAMEPAD_BUTTONS } from '../../../constants';
 
-class LaserSliderInput extends PureComponent {
+class SliderInput extends PureComponent {
     static propTypes = {
       min: PropTypes.number,
       max: PropTypes.number,
@@ -21,47 +19,7 @@ class LaserSliderInput extends PureComponent {
       };
     }
 
-    controllerEvents = {
-      'gamepad:button-action': (buttonName, value) => {
-        switch (buttonName) {
-        case GAMEPAD_BUTTONS.TRIANGLE:
-          this.handleChange(this.state.value + 1);
-          break;
-        case GAMEPAD_BUTTONS.CIRCLE:
-          this.handleChange(0);
-          break;
-        case GAMEPAD_BUTTONS.SPEED_INCREASE:
-          this.handleChange(this.state.value + 1);
-          break;
-        case GAMEPAD_BUTTONS.SPEED_DECREASE:
-          this.handleChange(this.state.value - 1);
-          break;
-        default: break;
-        }
-      },
-    }
-
-    addControllerEvents() {
-      Object.keys(this.controllerEvents).forEach(eventName => {
-        const callback = this.controllerEvents[eventName];
-        espController.addListener(eventName, callback);
-      });
-    }
-
-    removeControllerEvents() {
-      Object.keys(this.controllerEvents).forEach(eventName => {
-        const callback = this.controllerEvents[eventName];
-        espController.removeListener(eventName, callback);
-      });
-    }
-
-    componentWillUnmount() {
-      this.removeControllerEvents();
-    }
-
     componentDidMount() {
-      this.addControllerEvents();
-
       const rangeElement = document.querySelector('.range input[type="range"]');
       if (rangeElement) {
         rangeElement.setAttribute('min', this.props.min);
@@ -154,4 +112,4 @@ class LaserSliderInput extends PureComponent {
     }
 }
 
-export default LaserSliderInput;
+export default SliderInput;

@@ -19,8 +19,7 @@ import {
   WORKFLOW_STATE_RUNNING,
   LASER_DEVICE_MODE,
   FOUR_AXIS_DEVICE_MODE,
-  AXIS_C,
-  GAMEPAD_BUTTONS
+  AXIS_C
 } from '../../constants';
 import homeIcon from './images/home-outline.svg';
 
@@ -72,20 +71,7 @@ class DeviceAxes extends PureComponent {
             })
           }));
         }
-      },
-      'gamepad:button-action': (buttonName, value) => {
-        switch (buttonName) {
-        case GAMEPAD_BUTTONS.SQUARE:
-          espController.command('homing');
-          break;
-        case GAMEPAD_BUTTONS.CROSS:
-          ((this.props.deviceMode === FOUR_AXIS_DEVICE_MODE || this.props.deviceMode === LASER_DEVICE_MODE)
-            ? this.move({ X: 0, C: 0, Z: 0 })
-            : this.move({ X: 0, Z: 0 }));
-          break;
-        default: break;
-        }
-      },
+      }
     }
 
     componentDidMount() {
